@@ -8,4 +8,4 @@ Datum|AP NR|Zeitraum|Aufwand|Ort|Tätigkeit|Probleme|Quellen
 ## Tobias Kügerl
 Datum|AP NR|Zeitraum|Aufwand|Ort|Tätigkeit|Probleme|Quellen
 -----|-----|--------|-------|---|---------|--------|-------
-1.1.2023|1.1|7:30-10:00|2h15min|LBS|Ideenfindung|mir fällt nichts ein|[Projektmanagement]("https://de.wikipedia.org/wiki/Projektmanagement")
+4.2.2026|1.1|10:00-12:20|2h20min|LBS|Gantt Chart und Projektstrukturplan machen ||
