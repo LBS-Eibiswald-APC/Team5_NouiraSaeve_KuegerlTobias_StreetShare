@@ -7,6 +7,7 @@
 | 04.02.2026 | 1.1.3, 1.11.6          | 10:00 - 12:20 | 2h20min | LBS | Kommunikation eingerichtet, Projektstrukturplan                 | Git Login           | -       |
 | 04.02.2026 | 1.11.5, 1.11.6         | 15:00 - 16:00 | 1h00min | LBS | Strukturplan fertiggestellt, Gantt-Diagramm                     | -                   | -       | 
 | 05.02.2026 | 1.11.5, 1.11.6, 1.11.7 | 07:30 - 11:05 | 3h35min | LBS | Finale Strukturplan-Änderungen, Gantt-Diagramm, Projekthandbuch | Excel online access | -       |
+| 06.02.2026 | 1.11.7                 | 10:15 - 12:40 | 2h25min | LBS | Arbeitspakete im Projekthandbuch weiterschreiben                | -                   | -       |
 
 ## Tobias Kügerl
 
