@@ -9,6 +9,7 @@
 | 05.02.2026 | 1.11.5, 1.11.6, 1.11.7 | 07:30 - 11:05 | 3h35min | LBS | Finale Strukturplan-Änderungen, Gantt-Diagramm, Projekthandbuch | Excel online access | -       |
 | 06.02.2026 | 1.11.7                 | 10:15 - 12:40 | 2h25min | LBS | Arbeitspakete im Projekthandbuch weiterschreiben                | -                   | -       |
 | 06.02.2026 | 1.11.7                 | 14:50 - 15:20 | 0h30min | LBS | Arbeitspakete im Projekthandbuch weiterschreiben                | -                   | -       |
+| 09.02.2026 | 1.11.7, 1.11.5         | 09:30 - 10:25 | 0h55min | LBS | Arbeitspakete im Projekthandbuch, Gantt-chart fix               | -                   | -       |
 
 ## Tobias Kügerl
 
