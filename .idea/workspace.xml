@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6922ad98-407c-4b06-ac86-5c05ba89b39b" name="Changes" comment="++ alter eintrag" />
+    <list default="true" id="6922ad98-407c-4b06-ac86-5c05ba89b39b" name="Changes" comment="++ frontend init">
+      <change afterPath="$PROJECT_DIR$/Backend/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -82,7 +85,7 @@
       <option name="presentableId" value="Default" />
       <updated>1770200003981</updated>
       <workItem from="1770200005071" duration="7317000" />
-      <workItem from="1770706956845" duration="1328000" />
+      <workItem from="1770706956845" duration="1974000" />
     </task>
     <task id="LOCAL-00001" summary="++ git test">
       <option name="closed" value="true" />
@@ -116,7 +119,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770707800930</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="++ frontend init">
+      <option name="closed" value="true" />
+      <created>1770708379063</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1770708379063</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -128,6 +139,7 @@
     <MESSAGE value="++ delete idea" />
     <MESSAGE value="++ eintrag 04.02.26 nr 2" />
     <MESSAGE value="++ alter eintrag" />
-    <option name="LAST_COMMIT_MESSAGE" value="++ alter eintrag" />
+    <MESSAGE value="++ frontend init" />
+    <option name="LAST_COMMIT_MESSAGE" value="++ frontend init" />
   </component>
 </project>
