@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6922ad98-407c-4b06-ac86-5c05ba89b39b" name="Changes" comment="++ frontend init">
-      <change afterPath="$PROJECT_DIR$/Backend/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6922ad98-407c-4b06-ac86-5c05ba89b39b" name="Changes" comment="++ backend init" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,9 +63,27 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/Frontend/streetshare/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -85,7 +100,7 @@
       <option name="presentableId" value="Default" />
       <updated>1770200003981</updated>
       <workItem from="1770200005071" duration="7317000" />
-      <workItem from="1770706956845" duration="1974000" />
+      <workItem from="1770706956845" duration="2304000" />
     </task>
     <task id="LOCAL-00001" summary="++ git test">
       <option name="closed" value="true" />
@@ -127,7 +142,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770708379063</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="++ backend init">
+      <option name="closed" value="true" />
+      <created>1770708966189</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1770708966189</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,6 +163,7 @@
     <MESSAGE value="++ eintrag 04.02.26 nr 2" />
     <MESSAGE value="++ alter eintrag" />
     <MESSAGE value="++ frontend init" />
-    <option name="LAST_COMMIT_MESSAGE" value="++ frontend init" />
+    <MESSAGE value="++ backend init" />
+    <option name="LAST_COMMIT_MESSAGE" value="++ backend init" />
   </component>
 </project>
