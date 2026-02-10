@@ -1,0 +1,31 @@
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Projekttagebuch Streetshare\r\n---\r\n## Säve Nouira\r\nDatum|AP NR|Zeitraum|Aufwand|Ort|Tätigkeit|Probleme|Quellen\r\n-----|-----|--------|-------|---|---------|--------|-------\r\n1.1.2023|1.1|7:30-10:00|2h15min|LBS|Ideenfindung|mir fällt nichts ein|[Projektmanagement](\"https://de.wikipedia.org/wiki/Projektmanagement\")\r\n\r\n## Tobias Kügerl\r\nDatum|AP NR|Zeitraum|Aufwand|Ort|Tätigkeit|Probleme|Quellen\r\n-----|-----|--------|-------|---|---------|--------|-------\r\n4.2.2026|1.1|10:00-12:20|2h20min|LBS|Gantt Chart und Projektstrukturplan machen ||\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision 29203f98c16ef9e1a1c8b4e5a9350efa6f6c17b6)
++++ b/README.md	(date 1770213560244)
+@@ -1,11 +1,14 @@
+ # Projekttagebuch Streetshare
+ ---
++
+ ## Säve Nouira
+-Datum|AP NR|Zeitraum|Aufwand|Ort|Tätigkeit|Probleme|Quellen
+------|-----|--------|-------|---|---------|--------|-------
+-1.1.2023|1.1|7:30-10:00|2h15min|LBS|Ideenfindung|mir fällt nichts ein|[Projektmanagement]("https://de.wikipedia.org/wiki/Projektmanagement")
++
++| Datum    | AP NR | Zeitraum   | Aufwand | Ort | Tätigkeit    | Probleme             | Quellen                                                                |
++|----------|-------|------------|---------|-----|--------------|----------------------|------------------------------------------------------------------------|
++| 1.1.2023 | 1.1   | 7:30-10:00 | 2h15min | LBS | Ideenfindung | mir fällt nichts ein | [Projektmanagement]("https://de.wikipedia.org/wiki/Projektmanagement") |
+ 
+ ## Tobias Kügerl
+-Datum|AP NR|Zeitraum|Aufwand|Ort|Tätigkeit|Probleme|Quellen
+------|-----|--------|-------|---|---------|--------|-------
+-4.2.2026|1.1|10:00-12:20|2h20min|LBS|Gantt Chart und Projektstrukturplan machen ||
++
++| Datum    | AP NR | Zeitraum    | Aufwand | Ort | Tätigkeit                                  | Probleme | Quellen |
++|----------|-------|-------------|---------|-----|--------------------------------------------|----------|---------|
++| 4.2.2026 | 1.1.6 | 10:00-12:20 | 2h20min | LBS | Gantt Chart und Projektstrukturplan machen |          |         |
