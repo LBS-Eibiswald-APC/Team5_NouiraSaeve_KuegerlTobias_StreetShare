@@ -19,5 +19,6 @@
 | 05.02.2026 | 1.11.7                      | 07:30 - 11:05 | 3h35min | LBS | Im Projekthandbuch die Arbeitspakete anlegen                                  | -                  | -       |
 | 06.02.2026 | 1.11.7                      | 10:15 - 12:50 | 2h35min | LBS | Im Projekthandbuch die Arbeitspakete anlegen                                  | -                  | -       |
 | 10.02.2026 | 1.4.1, 1.4.2, 1.5.1 - 1.5.3 | 07:30 - 10:00 | 2h30min | LBS | Datenbank Design, Frontend / Backend Base erstellen, Dependencies installiert | -                  | -       |
+| 11.02.2026 | 1.6.1                       | 14:55 - 16:25 | 1h30min | LBS | Backend Basics machen                                                         | -                  | -       |
  
  
