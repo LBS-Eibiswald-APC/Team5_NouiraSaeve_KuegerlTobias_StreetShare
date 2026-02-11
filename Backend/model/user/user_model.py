@@ -16,11 +16,11 @@ class User(Base):
     address = Column(String(255), nullable=True)
     house_nr = Column(String(50), nullable=True)
     zip = Column(Integer, nullable=True)
-    #role_id = Column(
-    #    Integer,
-    #    ForeignKey("roles.id", ondelete="SET NULL"),
-    #    nullable=True
-    #)
+    role_id = Column(
+        Integer,
+        ForeignKey("roles.id", ondelete="SET NULL"),
+        nullable=True
+    )
     created_at = Column(
         DateTime,
         server_default=func.now()

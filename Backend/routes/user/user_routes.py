@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from core.database import get_db
-from model.user.user_model import User
+from crud.user.crud_user import user_crud
 from schemas.user.user_schema import UserCreate, UserResponse
+from model.user.user_model import User
 
 
 router = APIRouter(
@@ -13,16 +14,12 @@ router = APIRouter(
 )
 
 
-# Create User
 @router.post("/", response_model=UserResponse)
 def create_user(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
-
-    existing_user = db.query(User).filter(
-        User.email == user.email
-    ).first()
+    existing_user = user_crud.get_by_email(db, user.email)
 
     if existing_user:
         raise HTTPException(
@@ -35,7 +32,7 @@ def create_user(
         last_name=user.last_name,
         display_name=user.display_name,
         email=user.email,
-        hashed_pw=user.password,  # pw hashen
+        hashed_pw=user.password,
         phone=user.phone,
         address=user.address,
         house_nr=user.house_nr,
@@ -50,28 +47,21 @@ def create_user(
     return db_user
 
 
-# Get all Users
 @router.get("/", response_model=List[UserResponse])
 def get_users(
     db: Session = Depends(get_db)
 ):
+    return user_crud.get_all(db)
 
-    return db.query(User).all()
 
-
-# Get user by ID
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
     user_id: int,
     db: Session = Depends(get_db)
 ):
-
-    user = db.query(User).filter(
-        User.id == user_id
-    ).first()
+    user = user_crud.get(db, user_id)
 
     if not user:
-
         raise HTTPException(
             status_code=404,
             detail="User not found"
@@ -80,25 +70,17 @@ def get_user(
     return user
 
 
-# DELETE USER
 @router.delete("/{user_id}")
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db)
 ):
-
-    user = db.query(User).filter(
-        User.id == user_id
-    ).first()
+    user = user_crud.delete(db, user_id)
 
     if not user:
-
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
-
-    db.delete(user)
-    db.commit()
 
     return {"message": "User deleted"}
