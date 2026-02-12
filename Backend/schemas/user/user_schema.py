@@ -7,7 +7,7 @@ class UserBase(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     display_name: Optional[str] = None
-
+    hashed_pw: Optional[str] = None
     email: Optional[EmailStr] = None
 
     phone: Optional[str] = None
@@ -20,11 +20,13 @@ class UserBase(BaseModel):
     role_id: Optional[int] = None
 
 
-class UserCreate(UserBase):
-    password: str
+class UserRegister(UserBase):
+    hashed_pw: str
+
 
 class UserUpdate(UserBase):
     password: str
+
 
 class UserResponse(UserBase):
     id: int
@@ -32,3 +34,8 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
