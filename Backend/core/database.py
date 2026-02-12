@@ -1,13 +1,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from core.config import settings
+from Backend.env_helper import env
 
 DATABASE_URL = (
-    f"mysql+pymysql://{settings.DB_USER}:"
-    f"{settings.DB_PASSWORD}@"
-    f"{settings.DB_HOST}:"
-    f"{settings.DB_PORT}/"
-    f"{settings.DB_NAME}"
+    f"mysql+pymysql://{env('DB_USER')}:"
+    f"{env('DB_PASSWORD')}@"
+    f"{env('DB_HOST')}:"
+    f"{env('DB_PORT')}/"
+    f"{env('DB_NAME')}"
 )
 engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(
