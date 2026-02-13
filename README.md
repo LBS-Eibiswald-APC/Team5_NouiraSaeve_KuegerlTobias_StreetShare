@@ -12,7 +12,8 @@
 | 09.02.2026 | 1.11.7, 1.11.5                    | 09:30 - 10:25 | 0h55min | LBS | Arbeitspakete im Projekthandbuch, Gantt-chart fix                                            | -                     | -                             |
 | 10.02.2026 | 1.4.1, 1.4.2, 1.5.1, 1.5.2, 1.5.3 | 07:30 - 10:00 | 2h30min | LBS | Datenbank erstellt, Ordnerstruktur erstellt, dependencies installiert                        | NodeJS version update | -                             |
 | 11.02.2026 | 1.6.1                             | 14:55 - 16:20 | 1h25min | LBS | Backend-Basics                                                                               | Pycharm Git-Access    | https://fastapi.tiangolo.com/ |
-| 12.02.2026 | 1.6.1, 1.6.2, 1.6.3, 1.11.5       | 07:30 - 11:05 | 2h35min | LBS | Backend-Basics, CRUD-Funktionen, Beginn Benutzerauth. Beginn Transactions, Gantt-chart-fixes |                       |                               |
+| 12.02.2026 | 1.6.1, 1.6.2, 1.6.3, 1.11.5       | 07:30 - 11:05 | 2h35min | LBS | Backend-Basics, CRUD-Funktionen, Beginn Benutzerauth. Beginn Transactions, Gantt-chart-fixes | -                     |                               |
+| 13.02.2026 | 1.6.3, 1.6.2                      | 10:15 - 12:50 | 2h35min | LBS | CRUD-Funktionen anpassen, User auth                                                          | -                     | -                             |
 
 ## Tobias Kügerl
 
