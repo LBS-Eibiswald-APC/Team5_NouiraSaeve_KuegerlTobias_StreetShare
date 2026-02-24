@@ -15,7 +15,7 @@ class UserBase(BaseModel):
     address: Optional[str] = None
     house_nr: Optional[str] = None
 
-    zip: Optional[int] = None
+    zip: Optional[str] = None
 
     role_id: Optional[int] = None
 
