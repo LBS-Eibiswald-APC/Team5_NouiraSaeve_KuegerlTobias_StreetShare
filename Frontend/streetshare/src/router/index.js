@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import LoginView from "@/components/Login/Login.vue";
-import LandingPage from "@/components/Landing/LandingPage.vue";
+import LoginView from "@/views/Login/Login.vue";
+import RegisterView from "@/views/Login/Register.vue";
+import LandingPage from "@/views/LandingPage/LandingPage.vue";
+import MainPage from "@/views/Main/Main.vue";
 import {useAuthStore} from "@/store/authStore.js";
 
 const routes = [
@@ -9,15 +11,26 @@ const routes = [
         path: "/login",
         name: "login",
         component: LoginView,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false, showNav: true }
+    },
+    {
+        path: "/register",
+        name: "register",
+        component: RegisterView,
+        meta: { requiresAuth: false, showNav: true  }
+    },
+    {
+        path: "/main",
+        name: "main",
+        component: MainPage,
+        meta: { requiresAuth: true, showNav: false  }
     },
     {
         path: "/",
         name: "landing",
         component: LandingPage,
-        meta: { requiresAuth: true }
+        meta: {requiresAuth: false, showNav: false }
     }
-
 ];
 
 const router = createRouter({
@@ -31,7 +44,7 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth && !auth.isAuthenticated) {
         next("/login");
     } else if (to.path === "/login" && auth.isAuthenticated) {
-        next("/");
+        next("/main");
     } else {
         next();
     }
