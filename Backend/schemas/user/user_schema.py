@@ -17,7 +17,7 @@ class UserBase(BaseModel):
     city: Optional[str] = None
     country: Optional[str] = None
 
-    zip: Optional[int] = None
+    zip: Optional[str] = None
 
     role_id: Optional[int] = None
 

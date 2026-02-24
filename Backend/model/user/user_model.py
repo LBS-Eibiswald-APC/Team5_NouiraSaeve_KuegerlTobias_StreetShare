@@ -17,7 +17,7 @@ class User(Base):
     house_nr = Column(String(50), nullable=True)
     city = Column(String(50), nullable=True)
     country = Column(String(50), nullable=True)
-    zip = Column(Integer, nullable=True)
+    zip = Column(String(50), nullable=True)
     role_id = Column(
         Integer,
         ForeignKey("roles.id", ondelete="SET NULL"),
