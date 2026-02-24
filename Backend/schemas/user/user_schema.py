@@ -12,8 +12,10 @@ class UserBase(BaseModel):
 
     phone: Optional[str] = None
 
-    address: Optional[str] = None
+    street: Optional[str] = None
     house_nr: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
 
     zip: Optional[int] = None
 
