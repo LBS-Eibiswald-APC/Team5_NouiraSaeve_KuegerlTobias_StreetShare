@@ -26,5 +26,7 @@
 | 11.02.2026 | 1.6.1                       | 14:55 - 16:25 | 1h30min | LBS | Backend Basics machen                                                         | -                  | -       |
 | 12.02.2026 | 1.6.1, 1.6.3                | 07:30 - 11:05 | 2h35min | LBS | Backend Basics weitermachen, Frontend Basic Login erstellen                   | -                  | -       |
 | 13.02.2026 | 1.6.1, 1.6.3                | 10:15 - 12:50 | 2h35min | LBS | Backend Basics weitermachen, Frontend Basic Login erstellen                   | -                  | -       |           |                             |               |         |     |                                                                               |                    |         |
+| 23.02.2026 | 1.7.4, 1.7.1                | 10:50 - 12:20 | 1h30min | LBS | Frontend Landing Page, Login                                                  | -                  | -       |
+| 24.02.2026 | 1.7.4, 1.7.1                | 07:30 - 10:00 | 2h30min | LBS | Frontend Landing fertig machen, Registrierung anfangen                        | -                  | -       |
  
  
