@@ -5,6 +5,7 @@ from decimal import Decimal
 
 class ToolCreate(BaseModel):
     name: str
+    description: str
     base_price: Decimal | None = None
     deposit: Decimal | None = None
     tool_condition: str | None = None
@@ -13,6 +14,7 @@ class ToolCreate(BaseModel):
 
 class ToolUpdate(BaseModel):
     name: str | None = None
+    description: str | None = None
     base_price: Decimal | None = None
     deposit: Decimal | None = None
     tool_condition: str | None = None
@@ -21,11 +23,14 @@ class ToolUpdate(BaseModel):
 class ToolResponse(BaseModel):
     id: int
     name: str
-    base_price: Decimal | None
-    deposit: Decimal | None
+    description: str
+    base_price: float | None
+    deposit: float | None
     tool_condition: str | None
-    created_at: datetime | None
-    created_by: int | None
+
+    creator_display_name: str | None
+    creator_city: str | None
+    creator_country: str | None
 
     class Config:
         from_attributes = True

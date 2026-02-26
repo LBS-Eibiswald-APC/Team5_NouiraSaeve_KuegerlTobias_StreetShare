@@ -14,6 +14,14 @@ export const useAuthStore = defineStore("auth", {
 
 
     actions: {
+        async getMe() {
+            try {
+                const response = await api.get("/users/me");
+                return response.data
+            } catch (error) {
+                return null
+            }
+        },
         async register(payload) {
             this.loading = true;
             this.error = null;
@@ -44,9 +52,15 @@ export const useAuthStore = defineStore("auth", {
             this.loading = true;
             this.error = null;
             try {
+                const formData = new URLSearchParams();
+                formData.append("username", payload.email);
+                formData.append("password", payload.password);
                 const response = await api.post(
                     "/auth/login",
-                    payload
+                    formData,
+                    {
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    }
                 );
                 this.token = response.data.access_token;
                 this.user = response.data.user;
@@ -55,6 +69,7 @@ export const useAuthStore = defineStore("auth", {
                     "token",
                     this.token
                 );
+                return true
             } catch (error) {
                 this.error =
                     error.response?.data?.detail ||
@@ -64,6 +79,7 @@ export const useAuthStore = defineStore("auth", {
             } finally {
                 this.loading = false;
             }
+            return false
         },
 
 

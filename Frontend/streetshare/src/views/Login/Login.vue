@@ -34,6 +34,12 @@
             Login
           </button>
         </form>
+        <p class="text-neutral-500 text-sm mt-6 text-center">
+          Noch kein Konto?
+          <span @click="router.push('/register')" class="text-lime-400 cursor-pointer hover:underline">
+            Jetzt registrieren
+          </span>
+        </p>
       </div>
     </div>
 
@@ -56,15 +62,14 @@ const router = useRouter();
 
 
 const handleLogin = async () => {
-
   try {
-    await auth.login({
-
+    const req = ref(await auth.login({
       email: email.value,
       password: password.value
-
-    });
-    await router.push("/main");
+    }))
+    if (req) {
+      await router.push("/main");
+    }
   } catch {}
 
 };

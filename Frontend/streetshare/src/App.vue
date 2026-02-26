@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
+import MainNav from "@/components/MainNav.vue";
 
 const route = useRoute();
 </script>
@@ -9,6 +10,7 @@ const route = useRoute();
   <div class="min-h-screen bg-neutral-950 text-white font-sans flex flex-col">
     <transition name="fade-slide">
       <Navbar v-if="route.meta.showNav" />
+      <MainNav v-else-if="route.meta.showNav === false" />
     </transition>
     <router-view v-slot="{ Component }">
       <transition name="fade-slide" mode="out-in">

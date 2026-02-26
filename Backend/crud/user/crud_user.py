@@ -44,6 +44,9 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
         to_encode = {
             "sub": str(user.id),
             "role": user.role.name,
+            "display_name": user.display_name,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
             "exp": expire
         }
         return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -54,11 +57,17 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_id: str = payload.get("sub")
             role: str = payload.get("role")
+            last_name: str = payload.get("last_name")
+            first_name: str = payload.get("first_name")
+            display_name: str = payload.get("display_name")
             if user_id is None:
                 raise HTTPException(status_code=401, detail="Invalid token")
             return {
                 "id": int(user_id),
-                "role": role
+                "role": role,
+                "display_name": display_name,
+                "last_name": last_name,
+                "first_name": first_name,
             }
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")

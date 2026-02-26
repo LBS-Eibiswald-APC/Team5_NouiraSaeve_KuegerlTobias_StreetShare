@@ -5,7 +5,6 @@ import { useAuthStore } from "@/store/authStore";
 
 const auth = useAuthStore();
 
-// Formfelder
 const firstname = ref("");
 const lastname = ref("");
 const displayname = ref("");
@@ -19,13 +18,10 @@ const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 
-// Fehlerobjekt
 const errors = ref({});
 
-// Liste Länder (ein paar als Beispiel)
 const countries = ["Österreich", "Deutschland", "Schweiz", "Italien", "Frankreich"];
 
-// Validierungen
 const emailValid = computed(() =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
 );
@@ -34,7 +30,6 @@ const passwordValid = computed(() =>
     /^(?=.*\d).{8,}$/.test(password.value)
 );
 
-// Telefonnummer: +43 123456789 oder +49 1234567890 etc.
 const phoneValid = computed(() =>
     /^\+\d{1,3}\s?\d{4,14}$/.test(phone.value)
 );
@@ -58,7 +53,6 @@ const formValid = computed(() =>
     passwordsMatch.value
 );
 
-// Registrierung
 const register = async () => {
   errors.value = {};
 
@@ -111,7 +105,6 @@ const register = async () => {
         <h2 class="text-3xl font-bold mb-4">Konto erstellen</h2>
         <form @submit.prevent="register" class="space-y-5">
 
-          <!-- Vorname / Nachname nebeneinander -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm mb-2 text-neutral-400">Vorname</label>
@@ -128,7 +121,6 @@ const register = async () => {
             </div>
           </div>
 
-          <!-- Displayname / Telefon -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm mb-2 text-neutral-400">Displayname</label>
@@ -144,7 +136,6 @@ const register = async () => {
             </div>
           </div>
 
-          <!-- Straße / Hausnummer -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm mb-2 text-neutral-400">Straße</label>
@@ -160,7 +151,6 @@ const register = async () => {
             </div>
           </div>
 
-          <!-- Stadt / PLZ -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm mb-2 text-neutral-400">Stadt</label>
@@ -176,7 +166,6 @@ const register = async () => {
             </div>
           </div>
 
-          <!-- Country Dropdown -->
           <div>
             <label class="block text-sm mb-2 text-neutral-400">Land</label>
             <select v-model="country" class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition">
@@ -186,7 +175,6 @@ const register = async () => {
             <p v-if="errors.country" class="text-red-400 text-sm mt-1">{{ errors.country }}</p>
           </div>
 
-          <!-- E-Mail -->
           <div>
             <label class="block text-sm mb-2 text-neutral-400">E-Mail</label>
             <input v-model="email" type="email" placeholder="max@email.com"
@@ -194,7 +182,6 @@ const register = async () => {
             <p v-if="errors.email" class="text-red-400 text-sm mt-1">{{ errors.email }}</p>
           </div>
 
-          <!-- Passwort -->
           <div>
             <label class="block text-sm mb-2 text-neutral-400">Passwort</label>
             <input v-model="password" type="password" placeholder="••••••••"
@@ -202,7 +189,6 @@ const register = async () => {
             <p v-if="errors.password" class="text-red-400 text-sm mt-1">{{ errors.password }}</p>
           </div>
 
-          <!-- Passwort bestätigen -->
           <div>
             <label class="block text-sm mb-2 text-neutral-400">Passwort bestätigen</label>
             <input v-model="confirmPassword" type="password" placeholder="••••••••"
@@ -210,7 +196,6 @@ const register = async () => {
             <p v-if="errors.confirmPassword" class="text-red-400 text-sm mt-1">{{ errors.confirmPassword }}</p>
           </div>
 
-          <!-- Submit -->
           <button type="submit"
                   :disabled="!formValid"
                   class="w-full cursor-pointer bg-lime-400 text-black py-3 rounded-lg font-semibold hover:scale-[1.02] transition disabled:opacity-50 disabled:cursor-not-allowed">

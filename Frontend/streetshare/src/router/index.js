@@ -4,6 +4,7 @@ import LoginView from "@/views/Login/Login.vue";
 import RegisterView from "@/views/Login/Register.vue";
 import LandingPage from "@/views/LandingPage/LandingPage.vue";
 import MainPage from "@/views/Main/Main.vue";
+import UserMe from "@/views/User/UserMe.vue";
 import {useAuthStore} from "@/store/authStore.js";
 
 const routes = [
@@ -29,7 +30,13 @@ const routes = [
         path: "/",
         name: "landing",
         component: LandingPage,
-        meta: {requiresAuth: false, showNav: false }
+        meta: {requiresAuth: false, showNav: null }
+    },
+    {
+        path: "/user/me",
+        name: "user_me",
+        component: UserMe,
+        meta: {requiresAuth: true, showNav: false }
     }
 ];
 
