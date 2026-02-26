@@ -16,17 +16,18 @@
 | 13.02.2026 | 1.6.3, 1.6.2                      | 10:15 - 12:50 | 2h35min | LBS | CRUD-Funktionen anpassen, User auth                                                          | -                     | -                             |
 
 ## Tobias Kügerl
-| Datum      | AP NR                       | Zeitraum      | Aufwand | Ort | Tätigkeit                                                                     | Probleme           | Quellen |
-|------------|-----------------------------|---------------|---------|-----|-------------------------------------------------------------------------------|--------------------|---------|
-| 04.02.2026 | 1.1.3, 1.11.6               | 10:00 - 12:20 | 2h20min | LBS | Kommunikation, Projektstrukturplan                                            | Git clone Probleme | -       | 
-| 04.02.2026 | 1.11.6, 1.5.1-1.5.3, 1.11.7 | 14:55 - 16:25 | 1h30min | LBS | Projektstrukturplan, DB-Design und erstellt, Projekthandbuch eintragen        | -                  | -       |
-| 05.02.2026 | 1.11.7                      | 07:30 - 11:05 | 2h35min | LBS | Im Projekthandbuch die Arbeitspakete anlegen                                  | -                  | -       |
-| 06.02.2026 | 1.11.7                      | 10:15 - 12:50 | 2h35min | LBS | Im Projekthandbuch die Arbeitspakete anlegen                                  | -                  | -       |
-| 10.02.2026 | 1.4.1, 1.4.2, 1.5.1 - 1.5.3 | 07:30 - 10:00 | 2h30min | LBS | Datenbank Design, Frontend / Backend Base erstellen, Dependencies installiert | -                  | -       |
-| 11.02.2026 | 1.6.1                       | 14:55 - 16:25 | 1h30min | LBS | Backend Basics machen                                                         | -                  | -       |
-| 12.02.2026 | 1.6.1, 1.6.3                | 07:30 - 11:05 | 2h35min | LBS | Backend Basics weitermachen, Frontend Basic Login erstellen                   | -                  | -       |
-| 13.02.2026 | 1.6.1, 1.6.3                | 10:15 - 12:50 | 2h35min | LBS | Backend Basics weitermachen, Frontend Basic Login erstellen                   | -                  | -       |           |                             |               |         |     |                                                                               |                    |         |
-| 23.02.2026 | 1.7.4, 1.7.1                | 10:50 - 12:20 | 1h30min | LBS | Frontend Landing Page, Login                                                  | -                  | -       |
-| 24.02.2026 | 1.7.4, 1.7.1                | 07:30 - 10:00 | 2h30min | LBS | Frontend Landing fertig machen, Registrierung anfangen                        | -                  | -       |
+| Datum      | AP NR                       | Zeitraum       | Aufwand | Ort | Tätigkeit                                                                         | Probleme           | Quellen |
+|------------|-----------------------------|----------------|---------|-----|-----------------------------------------------------------------------------------|--------------------|---------|
+| 04.02.2026 | 1.1.3, 1.11.6               | 10:00 - 12:20  | 2h20min | LBS | Kommunikation, Projektstrukturplan                                                | Git clone Probleme | -       | 
+| 04.02.2026 | 1.11.6, 1.5.1-1.5.3, 1.11.7 | 14:55 - 16:25  | 1h30min | LBS | Projektstrukturplan, DB-Design und erstellt, Projekthandbuch eintragen            | -                  | -       |
+| 05.02.2026 | 1.11.7                      | 07:30 - 11:05  | 3h35min | LBS | Im Projekthandbuch die Arbeitspakete anlegen                                      | -                  | -       |
+| 06.02.2026 | 1.11.7                      | 10:15 - 12:50  | 2h35min | LBS | Im Projekthandbuch die Arbeitspakete anlegen                                      | -                  | -       |
+| 10.02.2026 | 1.4.1, 1.4.2, 1.5.1 - 1.5.3 | 07:30 - 10:00  | 2h30min | LBS | Datenbank Design, Frontend / Backend Base erstellen, Dependencies installiert     | -                  | -       |
+| 11.02.2026 | 1.6.1                       | 14:55 - 16:25  | 1h30min | LBS | Backend Basics machen                                                             | -                  | -       |
+| 12.02.2026 | 1.6.1, 1.6.3                | 07:30 - 11:05  | 3h35min | LBS | Backend Basics weitermachen, Frontend Basic Login erstellen                       | -                  | -       |
+| 13.02.2026 | 1.6.1, 1.6.3                | 10:15 - 12:50  | 2h35min | LBS | Backend Basics weitermachen, Frontend Basic Login erstellen                       | -                  | -       |           |                             |               |         |     |                                                                               |                    |         |
+| 23.02.2026 | 1.7.4, 1.7.1                | 10:50 - 12:20  | 1h30min | LBS | Frontend Landing Page, Login                                                      | -                  | -       |
+| 24.02.2026 | 1.7.4, 1.7.1                | 07:30 - 10:00  | 2h30min | LBS | Frontend Landing fertig machen, Registrierung anfangen                            | -                  | -       |
+| 26.02.2026 | 1.7.2, 1.7.4                | 07:30 - 11:05  | 3h35min | LBS | Frontend Main Page anfangen, Nav und User Seite erstellen, Registrierung finishen | -                  | -       |
  
  
