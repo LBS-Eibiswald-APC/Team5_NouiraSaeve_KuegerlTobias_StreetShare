@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List
 from Backend.core.database import get_db
@@ -26,19 +27,17 @@ def register(
 
 @router.post("/login")
 def login(
-        user: UserLogin,
-        db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
 ):
-    verify_user = user_crud.get_by_email(db, user.email)
-    if verify_user:
-        if user_crud.verify_password(user.password, verify_user.hashed_pw):
-            access_token = user_crud.create_access_token(
-                data={"sub": verify_user.display_name},
-                expires_delta=timedelta(minutes=30)
-            )
-            return {
-                "access_token": access_token,
-                "token_type": "bearer"
-            }
-        else:
-            raise HTTPException(status_code=400, detail="Incorrect email or password")
+    verify_user = user_crud.get_by_email(db, form_data.username)
+
+    if not verify_user or not user_crud.verify_password(form_data.password, verify_user.hashed_pw):
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+
+    access_token = user_crud.create_access_token(verify_user)
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }

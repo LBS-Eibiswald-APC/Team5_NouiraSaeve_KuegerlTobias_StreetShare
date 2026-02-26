@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from core.database import Base
 
@@ -23,7 +24,9 @@ class User(Base):
         ForeignKey("roles.id", ondelete="SET NULL"),
         nullable=True
     )
+    role = relationship("Role")
     created_at = Column(
         DateTime,
         server_default=func.now()
     )
+
