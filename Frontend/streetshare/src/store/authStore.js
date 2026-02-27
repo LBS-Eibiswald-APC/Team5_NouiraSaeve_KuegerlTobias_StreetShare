@@ -6,6 +6,7 @@ export const useAuthStore = defineStore("auth", {
 
     state: () => ({
         user: null,
+        user_id: null,
         token: localStorage.getItem("token") || null,
         isAuthenticated: !!localStorage.getItem("token"),
         loading: false,
@@ -17,6 +18,8 @@ export const useAuthStore = defineStore("auth", {
         async getMe() {
             try {
                 const response = await api.get("/users/me");
+                this.user = response.data;
+                this.user_id = response.data.id;
                 return response.data
             } catch (error) {
                 return null

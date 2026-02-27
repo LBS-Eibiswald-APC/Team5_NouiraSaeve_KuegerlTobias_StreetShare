@@ -1,13 +1,15 @@
-from datetime import timedelta
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from jose import jwt, JWTError
 from sqlalchemy.orm import Session
-from typing import List
+
+from starlette import status
+
 from Backend.core.database import get_db
 from Backend.crud.user.crud_user import user_crud
+from Backend.core.security import create_access_token, oauth2_scheme, SECRET_KEY, ALGORITHM
 
-from Backend.schemas.user.user_schema import UserLogin, UserRegister, UserResponse
+from Backend.schemas.user.user_schema import UserRegister, UserResponse
 
 router = APIRouter(
     prefix="/auth",
@@ -35,9 +37,20 @@ def login(
     if not verify_user or not user_crud.verify_password(form_data.password, verify_user.hashed_pw):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
-    access_token = user_crud.create_access_token(verify_user)
+    access_token = create_access_token(verify_user)
 
     return {
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+@router.get("/verify-token")
+def verify_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return {"valid": True, "exp": payload.get("exp")}
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalid or expired",
+        )

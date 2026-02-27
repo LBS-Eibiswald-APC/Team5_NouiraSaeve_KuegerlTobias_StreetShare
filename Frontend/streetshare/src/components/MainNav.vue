@@ -20,6 +20,7 @@ onMounted(fetchUser);
 
 const goLogin = () => router.push("/login");
 const goUserPage = () => router.push("/user/me");
+const goMain = () => router.push("/main");
 
 const logout = () => {
   auth.logout();
