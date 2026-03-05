@@ -1,10 +1,12 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from core.database import Base, engine
-from routes.user.user_routes import router as user_router
-from routes.role.role_routes import router as role_router
-from routes.tool.tool_routes import router as tool_routes
+from Backend.core.database import Base, engine
+from Backend.routes.user.user_routes import router as user_router
+from Backend.routes.role.role_routes import router as role_router
+from Backend.routes.tool.tool_routes import router as tool_routes
+from Backend.routes.user.auth import router as auth_router
+from Backend.routes.transactions.transaction_routes import router as transaction_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -23,6 +25,10 @@ app.add_middleware(
 app.include_router(user_router)
 app.include_router(role_router)
 app.include_router(tool_routes)
+
+app.include_router(auth_router)
+
+app.include_router(transaction_routes)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
