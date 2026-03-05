@@ -70,7 +70,7 @@ watch(showModal, async (newVal) => {
   <div class="min-h-screen bg-neutral-950 text-white font-sans px-6 py-10 flex gap-6">
     <!-- Sidebar -->
     <nav class="w-64 bg-neutral-900 rounded-2xl p-6 flex flex-col gap-4 ml-20 ">
-      <h2 class="text-xl font-bold text-lime-400 mb-4">Dashboard</h2>
+      <h2 class="text-xl font-bold text-lime-400 mb-2">Dashboard</h2>
       <button @click="activeTab = 'entries'"
               :class="{'bg-lime-400 text-black': activeTab==='entries'}"
               class="text-white px-4 py-2 rounded-xl hover:bg-lime-500 transition text-left cursor-pointer">

@@ -76,7 +76,7 @@
           <div>
             <div class="text-lime-400 text-4xl font-bold mb-4">3</div>
             <p class="text-neutral-400">
-              Gib das Gerät unbeschädigt zurück und erhalte dein Pfand automatisch zurück.
+              Gib das Gerät unbeschädigt zurück und erhalte dein Pfand automatisch zurückerstattet.
             </p>
           </div>
         </div>
