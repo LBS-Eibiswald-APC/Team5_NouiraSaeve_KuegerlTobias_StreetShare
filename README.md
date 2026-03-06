@@ -32,5 +32,6 @@
 | 26.02.2026 | 1.7.2, 1.7.4, 1.6.3         | 07:30 - 11:05 | 3h35min | LBS | Frontend Main Page anfangen, Nav und User Seite erstellen, Registrierung finishen, API Auth | -                  | -       |
 | 27.02.2026 | 1.7.2, 1.7.4, 1.6.4         | 10:15 - 12:50 | 2h35min | LBS | Frontend Main Page weitermachen und Landing, User Tool erstellen                            | -                  | -       |
 | 05.03.2026 | 1.7.2, 1.7.4                | 07:30 - 11:05 | 3h35min | LBS | Frontend Main Page weitermachen und User Page                                               | -                  | -       |
+| 06.03.2026 | 1.7.2                       | 10:15 - 12:50 | 2h35min | LBS | User Page                                                                                   | -                  | -       |
  
  
