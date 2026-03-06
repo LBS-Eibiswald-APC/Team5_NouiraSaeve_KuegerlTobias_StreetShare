@@ -5,10 +5,15 @@
         Street<span class="text-lime-400">Share</span>
       </h1>
       <div class="space-x-6 md:block">
-        <button @click="router.push('/register')" class="bg-lime-400 text-black px-5 py-2 rounded-full font-semibold hover:scale-105 transition">
+        <button @click="router.push('/register')" class="bg-lime-400 text-black px-5 py-2 rounded-full font-semibold hover:scale-105 transition cursor-pointer">
           Jetzt starten
         </button>
+        <button @click="router.push('/register')" class="bg-lime-400 text-black px-5 py-2 rounded-full font-semibold hover:scale-105 transition cursor-pointer">
+          Login
+        </button>
       </div>
+
+
     </nav>
     <section class="text-center py-28 px-6">
       <h2 class="text-5xl md:text-6xl font-bold leading-tight max-w-4xl mx-auto">

@@ -78,19 +78,4 @@ const handleLogin = async () => {
 
 
 <style scoped>
-
-.login-container {
-
-  max-width: 400px;
-  margin: 100px auto;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.error {
-  color: red;
-}
-
 </style>
