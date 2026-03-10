@@ -58,7 +58,7 @@ async function applyFilters() {
                class="w-full border border-neutral-700 rounded-xl px-4 py-2 mb-5 bg-neutral-950 text-white placeholder-neutral-500"/>
         <input @keydown.enter="applyFilters" v-model="toolStore.filters.zip" placeholder="PLZ"
                class="w-full border border-neutral-700 rounded-xl px-4 py-2 mb-5 bg-neutral-950 text-white placeholder-neutral-500"/>
-        <select @change="applyFilters" v-model="toolStore.filters.country"
+        <select v-model="toolStore.filters.country"
                 class="w-full border border-neutral-700 rounded-xl px-4 py-2 mb-5 bg-neutral-950 text-white placeholder-neutral-500">
           <option value="">Alle Länder</option>
           <option v-for="c in toolStore.countries" :key="c" :value="c">{{ c }}</option>

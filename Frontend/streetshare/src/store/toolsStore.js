@@ -38,9 +38,9 @@ export const useToolsStore = defineStore("tools", {
                     const data = response.data;
                     this.tools = data.tools.map(t => ({
                         ...t,
-                        creator_display_name: t.creator_display_name ?? "N/A",
-                        creator_city: t.creator_city ?? "Unbekannt",
-                        creator_country: t.creator_country ?? "",
+                        creator_display_name: t.creator_display_name,
+                        creator_city: t.creator_city,
+                        creator_country: t.creator_country,
                     }));
                     this.total = data.total;
                 } else {
