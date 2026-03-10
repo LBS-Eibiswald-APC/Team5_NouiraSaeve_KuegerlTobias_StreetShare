@@ -19,23 +19,17 @@ const conditions = ["Neu", "Minimal abgenutzt", "Gebraucht", "Gut abgenutzt", "D
 const activeTab = ref("entries");
 
 const usageFactor = {
-  "Neu": 0.35,
-  "Minimal abgenutzt": 0.30,
-  "Gebraucht": 0.25,
-  "Gut abgenutzt": 0.2,
-  "Defekt": 0.1,
+  "Neu": 0.25,
+  "Minimal abgenutzt": 0.22,
+  "Gebraucht": 0.18,
+  "Gut abgenutzt": 0.12,
+  "Defekt": 0.05,
 }
 
-const week_multiplier = 1
 
 function calcDeposit() {
   const factor = usageFactor[newTool.value.tool_condition]
-  let deposit = newTool.value.base_price * factor * week_multiplier
-  if (newTool.value.base_price < 100) {
-    deposit *= 0.8
-  } else {
-    deposit *= 0.7
-  }
+  let deposit = newTool.value.base_price * factor
   newTool.value.deposit = deposit.toFixed(2);
 }
 

@@ -1,7 +1,7 @@
 import os
 
 key_value = None
-env_path = os.path.join(os.path.dirname(__file__), ".env")
+env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
 
 def env(key: str, default: str | None = None) -> str | None:
     global key_value

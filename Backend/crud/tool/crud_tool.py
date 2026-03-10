@@ -6,6 +6,14 @@ from schemas.tool.tool_schema import ToolCreate, ToolUpdate
 from Backend.model.user.user_model import User
 from Backend.schemas.tool.tool_schema import ToolResponse
 
+usageFactor = {
+  "Neu": 0.25,
+  "Minimal abgenutzt": 0.22,
+  "Gebraucht": 0.18,
+  "Gut abgenutzt": 0.12,
+  "Defekt": 0.05,
+}
+
 
 class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
     def get_user_tools(
@@ -68,5 +76,22 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
             ))
 
         return {"tools": response, "total": total}
+
+    def create(self, db: Session, obj_in: ToolCreate):
+        factor = usageFactor.get(obj_in.tool_condition, 0.18)  # default fallback
+        calculated_deposit = obj_in.base_price * factor
+        db_obj = Tool(
+            name=obj_in.name,
+            description=obj_in.description,
+            base_price=obj_in.base_price,
+            deposit=calculated_deposit,
+            tool_condition=obj_in.tool_condition,
+            created_by=obj_in.created_by
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
 
 tool_crud = CRUDTool(Tool)
