@@ -8,7 +8,7 @@
         <button @click="router.push('/register')" class="bg-lime-400 text-black px-5 py-2 rounded-full font-semibold hover:scale-105 transition cursor-pointer">
           Jetzt starten
         </button>
-        <button @click="router.push('/register')" class="bg-lime-400 text-black px-5 py-2 rounded-full font-semibold hover:scale-105 transition cursor-pointer">
+        <button @click="router.push('/login')" class="bg-lime-400 text-black px-5 py-2 rounded-full font-semibold hover:scale-105 transition cursor-pointer">
           Login
         </button>
       </div>

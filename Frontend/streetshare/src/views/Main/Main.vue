@@ -51,7 +51,7 @@ async function applyFilters() {
 <template>
   <div class="min-h-screen bg-neutral-950 text-white font-sans px-6 py-10">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 cursor-pointer">
-      <div class="md:w-1/4 bg-neutral-900 p-6 rounded-2xl shadow-lg space-y-4 mt-12" style="height: 220px">
+      <div class="md:w-1/4 bg-neutral-900 p-6 rounded-2xl shadow-lg space-y-4 mt-12" style="height: 350px">
         <h2 class="text-xl font-bold text-lime-400 mb-4">Filter</h2>
 
         <input @keydown.enter="applyFilters" v-model="toolStore.filters.city" placeholder="Stadt"
