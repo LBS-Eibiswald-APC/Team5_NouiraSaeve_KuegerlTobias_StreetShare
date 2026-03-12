@@ -2,17 +2,12 @@ from sqlalchemy.orm import Session, joinedload
 from crud.base import CRUDBase
 from model.tools.tools_model import Tool
 from schemas.tool.tool_schema import ToolCreate, ToolUpdate
+from util.util import usageFactor
 
 from Backend.model.user.user_model import User
 from Backend.schemas.tool.tool_schema import ToolResponse
 
-usageFactor = {
-  "Neu": 0.25,
-  "Minimal abgenutzt": 0.22,
-  "Gebraucht": 0.18,
-  "Gut abgenutzt": 0.12,
-  "Defekt": 0.05,
-}
+
 
 
 class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
@@ -79,7 +74,7 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
 
     def create(self, db: Session, obj_in: ToolCreate):
         factor = usageFactor.get(obj_in.tool_condition, 0.18)  # default fallback
-        calculated_deposit = obj_in.base_price * factor
+        calculated_deposit = round(obj_in.base_price * factor, 2)
         db_obj = Tool(
             name=obj_in.name,
             description=obj_in.description,

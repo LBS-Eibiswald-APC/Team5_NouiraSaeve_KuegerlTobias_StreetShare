@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Dict
+from decimal import Decimal
 
 from Backend.core.database import get_db
 from Backend.crud.tool.crud_tool import tool_crud
 from Backend.crud.user.crud_user import user_crud
 from Backend.schemas.tool.tool_schema import ToolCreate, ToolResponse
+from util.util import usageFactor
+
 
 
 router = APIRouter(
