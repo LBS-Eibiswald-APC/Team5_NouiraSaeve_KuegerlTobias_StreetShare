@@ -7,7 +7,7 @@ from Backend.core.database import get_db
 from Backend.crud.tool.crud_tool import tool_crud
 from Backend.crud.user.crud_user import user_crud
 from Backend.schemas.tool.tool_schema import ToolCreate, ToolResponse
-from util.util import usageFactor
+from Backend.util.util import usageFactor
 
 
 
@@ -20,6 +20,15 @@ router = APIRouter(
 @router.post("/", response_model=ToolCreate)
 def create_tool(tool: ToolCreate, db: Session = Depends(get_db)):
     return tool_crud.create(db, tool)
+
+@router.get("/deposit-preview")
+def deposit_preview(
+    base_price: Decimal = Query(...),
+    tool_condition: str = Query(...)
+):
+    factor = usageFactor.get(tool_condition, Decimal("0.18"))
+    deposit = base_price * factor
+    return {"deposit": float(round(deposit, 2))}
 
 
 @router.get("/", response_model=Dict)

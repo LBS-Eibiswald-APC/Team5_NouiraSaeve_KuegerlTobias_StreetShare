@@ -18,23 +18,40 @@ const newTool = ref({
 const conditions = ["Neu", "Minimal abgenutzt", "Gebraucht", "Gut abgenutzt", "Defekt"];
 const activeTab = ref("entries");
 
-const usageFactor = {
-  "Neu": 0.25,
-  "Minimal abgenutzt": 0.22,
-  "Gebraucht": 0.18,
-  "Gut abgenutzt": 0.12,
-  "Defekt": 0.05,
-}
+let depositTimeout = null;
 
-
-function calcDeposit() {
-  const factor = usageFactor[newTool.value.tool_condition]
-  let deposit = newTool.value.base_price * factor
-  newTool.value.deposit = deposit.toFixed(2);
+function fetchDepositPreview() {
+  clearTimeout(depositTimeout);
+  depositTimeout = setTimeout(async () => {
+    if (newTool.value.base_price > 0 && newTool.value.tool_condition) {
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/tools/deposit-preview?base_price=${newTool.value.base_price}&tool_condition=${encodeURIComponent(newTool.value.tool_condition)}`
+        );
+        const data = await res.json();
+        newTool.value.deposit = data.deposit;
+      } catch (e) {
+        newTool.value.deposit = 0;
+      }
+    } else {
+      newTool.value.deposit = 0;
+    }
+  }, 300);
 }
 
 async function saveTool() {
-  calcDeposit()
+  // Fetch final deposit from backend before saving
+  if (newTool.value.base_price > 0 && newTool.value.tool_condition) {
+    try {
+      const res = await fetch(
+        `http://127.0.0.1:8000/tools/deposit-preview?base_price=${newTool.value.base_price}&tool_condition=${encodeURIComponent(newTool.value.tool_condition)}`
+      );
+      const data = await res.json();
+      newTool.value.deposit = data.deposit;
+    } catch (e) {
+      // Backend will recalculate anyway on create
+    }
+  }
   if (await toolStore.createTool(newTool.value)) {
     myTools.value = await toolStore.getUserTools();
   }
@@ -182,10 +199,10 @@ watch(showModal, async (newVal) => {
             <textarea rows="4" v-model="newTool.description" placeholder="Beschreibung"
                       class="px-4 py-2 rounded-xl bg-neutral-800 text-white"></textarea>
             <p>Preis:</p>
-            <input v-model.number="newTool.base_price" @input="calcDeposit()" type="number" placeholder="Preis"
+            <input v-model.number="newTool.base_price" @input="fetchDepositPreview()" type="number" placeholder="Preis"
                    class="px-4 py-2 rounded-xl bg-neutral-800 text-white"/>
             <p>Kondition:</p>
-            <select v-model="newTool.tool_condition" @change="calcDeposit()"
+            <select v-model="newTool.tool_condition" @change="fetchDepositPreview()"
                     class="px-4 py-2 rounded-xl bg-neutral-800 text-white">
               <option v-for="c in conditions" :key="c">{{ c }}</option>
             </select>
