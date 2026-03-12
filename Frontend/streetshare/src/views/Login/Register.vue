@@ -133,110 +133,181 @@ const register = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-neutral-950 text-white font-sans flex flex-col">
-    <div class="flex flex-1 justify-center px-6">
-      <div class="w-full max-w-4xl bg-neutral-900 p-8 rounded-2xl shadow-xl border border-neutral-800">
+  <div class="min-h-screen dark:text-white font-sans flex flex-col">
+    <div class="flex flex-1 justify-center px-6 mb-5">
+      <div class="w-full max-w-4xl bg-white dark:bg-neutral-900 p-8 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800">
 
-        <h2 class="text-3xl font-bold mb-4">Konto erstellen</h2>
+        <h2 class="text-3xl font-bold mb-4 text-neutral-900 dark:text-white">
+          Konto erstellen
+        </h2>
+
+        <p
+            v-if="errors.general"
+            class="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400"
+        >
+          {{ errors.general }}
+        </p>
+
         <form @submit.prevent="register" class="space-y-5">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">Vorname</label>
-              <input v-model="form.firstname" type="text" placeholder="Max"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.firstname" class="text-red-400 text-sm mt-1">{{ errors.firstname }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Vorname</label>
+              <input
+                  v-model="form.firstname"
+                  type="text"
+                  placeholder="Max"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.firstname" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.firstname }}</p>
             </div>
+
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">Nachname</label>
-              <input v-model="form.lastname" type="text" placeholder="Mustermann"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.lastname" class="text-red-400 text-sm mt-1">{{ errors.lastname }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Nachname</label>
+              <input
+                  v-model="form.lastname"
+                  type="text"
+                  placeholder="Mustermann"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.lastname" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.lastname }}</p>
             </div>
           </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">Displayname</label>
-              <input v-model="form.displayname" type="text" placeholder="MaxD"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.displayname" class="text-red-400 text-sm mt-1">{{ errors.displayname }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Displayname</label>
+              <input
+                  v-model="form.displayname"
+                  type="text"
+                  placeholder="MaxD"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.displayname" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.displayname }}</p>
             </div>
+
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">Telefon</label>
-              <input v-model="form.phone" type="text" placeholder="+43 123456789"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.phone" class="text-red-400 text-sm mt-1">{{ errors.phone }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Telefon</label>
+              <input
+                  v-model="form.phone"
+                  type="text"
+                  placeholder="+43 123456789"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.phone" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.phone }}</p>
             </div>
           </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">Straße</label>
-              <input v-model="form.street" type="text" placeholder="Musterstraße"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.street" class="text-red-400 text-sm mt-1">{{ errors.street }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Straße</label>
+              <input
+                  v-model="form.street"
+                  type="text"
+                  placeholder="Musterstraße"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.street" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.street }}</p>
             </div>
+
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">Hausnummer</label>
-              <input v-model="form.house_nr" type="text" placeholder="1"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.house_nr" class="text-red-400 text-sm mt-1">{{ errors.house_nr }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Hausnummer</label>
+              <input
+                  v-model="form.house_nr"
+                  type="text"
+                  placeholder="1"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.house_nr" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.house_nr }}</p>
             </div>
           </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">Stadt</label>
-              <input v-model="form.city" type="text" placeholder="Wien"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.city" class="text-red-400 text-sm mt-1">{{ errors.city }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Stadt</label>
+              <input
+                  v-model="form.city"
+                  type="text"
+                  placeholder="Wien"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.city" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.city }}</p>
             </div>
+
             <div>
-              <label class="block text-sm mb-2 text-neutral-400">PLZ</label>
-              <input v-model="form.zip" type="text" placeholder="1010"
-                     class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-              <p v-if="errors.zip" class="text-red-400 text-sm mt-1">{{ errors.zip }}</p>
+              <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">PLZ</label>
+              <input
+                  v-model="form.zip"
+                  type="text"
+                  placeholder="1010"
+                  class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+              />
+              <p v-if="errors.zip" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.zip }}</p>
             </div>
           </div>
+
           <div>
-            <label class="block text-sm mb-2 text-neutral-400">Land</label>
-            <select v-model="form.country" class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition">
+            <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Land</label>
+            <select
+                v-model="form.country"
+                class="w-full bg-white text-neutral-900 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+            >
               <option value="">Bitte wählen</option>
               <option v-for="c in countries" :key="c" :value="c">{{ c }}</option>
             </select>
-            <p v-if="errors.country" class="text-red-400 text-sm mt-1">{{ errors.country }}</p>
+            <p v-if="errors.country" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.country }}</p>
           </div>
+
           <div>
-            <label class="block text-sm mb-2 text-neutral-400">E-Mail</label>
-            <input v-model="form.email" type="email" placeholder="max@email.com"
-                   class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-            <p v-if="errors.email" class="text-red-400 text-sm mt-1">{{ errors.email }}</p>
+            <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">E-Mail</label>
+            <input
+                v-model="form.email"
+                type="email"
+                placeholder="max@email.com"
+                class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+            />
+            <p v-if="errors.email" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.email }}</p>
           </div>
+
           <div>
-            <label class="block text-sm mb-2 text-neutral-400">Passwort</label>
-            <input v-model="form.password" type="password" placeholder="••••••••"
-                   class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-            <p v-if="errors.password" class="text-red-400 text-sm mt-1">{{ errors.password }}</p>
+            <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Passwort</label>
+            <input
+                v-model="form.password"
+                type="password"
+                placeholder="••••••••"
+                class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+            />
+            <p v-if="errors.password" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.password }}</p>
           </div>
+
           <div>
-            <label class="block text-sm mb-2 text-neutral-400">Passwort bestätigen</label>
-            <input v-model="form.confirmPassword" type="password" placeholder="••••••••"
-                   class="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"/>
-            <p v-if="errors.confirmPassword" class="text-red-400 text-sm mt-1">{{ errors.confirmPassword }}</p>
+            <label class="block text-sm mb-2 text-neutral-700 dark:text-neutral-400">Passwort bestätigen</label>
+            <input
+                v-model="form.confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                class="w-full bg-white text-neutral-900 placeholder:text-neutral-400 border border-neutral-300 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 dark:border-neutral-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-400 transition"
+            />
+            <p v-if="errors.confirmPassword" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ errors.confirmPassword }}</p>
           </div>
+
           <button
               type="submit"
               :disabled="!formValid || isSubmitting"
-              class="w-full cursor-pointer bg-lime-400 text-black py-3 rounded-lg font-semibold hover:scale-[1.02] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full cursor-pointer bg-lime-500 text-black py-3 rounded-lg font-semibold hover:scale-[1.02] hover:bg-lime-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ isSubmitting ? "Registrieren..." : "Registrieren" }}
           </button>
-
         </form>
-        <p class="text-neutral-500 text-sm mt-6 text-center">
+
+        <p class="text-neutral-600 dark:text-neutral-500 text-sm mt-6 text-center">
           Bereits ein Konto?
-          <span @click="router.push('/login')" class="text-lime-400 cursor-pointer hover:underline">
+          <span
+              @click="router.push('/login')"
+              class="text-lime-600 dark:text-lime-400 cursor-pointer hover:underline"
+          >
             Jetzt einloggen
           </span>
         </p>
-
       </div>
     </div>
   </div>

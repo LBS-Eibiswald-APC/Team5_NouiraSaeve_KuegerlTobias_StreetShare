@@ -7,7 +7,7 @@ const route = useRoute();
 </script>
 
 <template>
-  <div class="min-h-screen bg-neutral-950 text-white font-sans flex flex-col">
+  <div class="min-h-screen bg-neutral-200 dark:bg-neutral-800 text-white font-sans flex flex-col">
     <transition name="fade-slide">
       <Navbar v-if="route.meta.showNav" />
       <MainNav v-else-if="route.meta.showNav === false" />
