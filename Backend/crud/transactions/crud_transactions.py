@@ -5,7 +5,9 @@ from Backend.schemas.transactions.transaction_schema import TransactionCreate, T
 
 
 class CRUDTool(CRUDBase[Transaction, TransactionCreate, TransactionUpdate]):
-    pass
+    def get_all_tools(self, db: Session, tool_id: int):
+        query = db.query(Transaction).filter(Transaction.tool_id == tool_id).all()
+        return query
 
 
 transaction_crud = CRUDTool(Transaction)

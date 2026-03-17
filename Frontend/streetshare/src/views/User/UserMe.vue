@@ -2,12 +2,21 @@
 import {ref, computed, watch, onMounted} from "vue";
 import {useToolsStore} from "@/store/toolsStore";
 import {useAuthStore} from "@/store/authStore.js";
+import ToolCreate from "@/components/PopUp/ToolCreate.vue";
+import ToolEdit from "@/components/PopUp/ToolEdit.vue";
+import {useTransactionsStore} from "@/store/transactionsStore.js";
 
 const toolStore = useToolsStore();
-const authStore = useAuthStore();
+const transactionsStore = useTransactionsStore();
+const euroFormat = new Intl.NumberFormat('de-DE', {
+  style: 'currency',
+  currency: 'EUR',
+});
 const showModal = ref(false);
+const showEdit = ref(false);
 
 const newTool = ref({
+  id: null,
   name: "",
   description: "",
   base_price: 0,
@@ -15,8 +24,9 @@ const newTool = ref({
   deposit: 0,
 });
 
-const conditions = ["Neu", "Minimal abgenutzt", "Gebraucht", "Gut abgenutzt", "Defekt"];
 const activeTab = ref("entries");
+
+const editTool = ref();
 
 const usageFactor = {
   "Neu": 0.35,
@@ -39,24 +49,38 @@ function calcDeposit() {
   newTool.value.deposit = deposit.toFixed(2);
 }
 
-async function saveTool() {
-  calcDeposit()
-  if (await toolStore.createTool(newTool.value)) {
-    myTools.value = await toolStore.getUserTools();
+async function loadMyTools() {
+  myTools.value = await toolStore.getUserTools();
+}
+
+import { useToast } from 'vue-toast-notification'
+import Settings from "@/views/User/Settings.vue";
+
+const $toast = useToast()
+
+async function clickedEdit(tool) {
+  const req = await transactionsStore.getTransactionsByToolId(tool.id);
+  console.log(req)
+  if (req && req.length <= 0) {
+    editTool.value = tool;
+    showEdit.value = true;
+  } else {
+    $toast.open({
+      message: 'Es gibt schon eine Transaktion!',
+      type: 'warning'
+    })
   }
-  showModal.value = false;
-  newTool.value = {name: "", description: "", base_price: 0, tool_condition: "Neu", deposit: 0};
 }
 
 const myTools = ref([]);
 
 onMounted(async () => {
-  myTools.value = await toolStore.getUserTools();
+  await loadMyTools();
 });
 
 watch(activeTab, async (newVal) => {
   if (newVal === "entries") {
-    myTools.value = await toolStore.getUserTools();
+    await loadMyTools();
   }
 });
 watch(showModal, async (newVal) => {
@@ -67,40 +91,40 @@ watch(showModal, async (newVal) => {
 </script>
 <template>
   <div
-      class="min-h-screen text-neutral-900 dark:text-white font-sans px-6 py-10 flex gap-6">
+      class="h-screen overflow-hidden text-neutral-900 dark:text-white font-sans px-6 flex gap-6">
     <!-- Sidebar -->
     <nav
-        class="w-64 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 flex flex-col gap-4 ml-20">
+        class="w-60 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 flex flex-col gap-y-2 ml-20">
       <h2 class="text-xl font-bold text-lime-600 dark:text-lime-400 mb-2">Dashboard</h2>
 
       <button
           @click="activeTab = 'entries'"
           :class="activeTab === 'entries'
-          ? 'bg-lime-500 text-black'
-          : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
-          class="px-4 py-2 rounded-xl transition text-left cursor-pointer"
+      ? 'bg-lime-500 text-black'
+      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
+          class="px-4 py-3 rounded-xl transition text-left cursor-pointer"
       >
         Meine Einträge
       </button>
 
       <button
-          @click="activeTab = 'deposit'"
-          :class="activeTab === 'deposit'
-          ? 'bg-lime-500 text-black'
-          : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
-          class="px-4 py-2 rounded-xl transition text-left cursor-pointer"
+          @click="activeTab = 'transactions'"
+          :class="activeTab === 'transactions'
+      ? 'bg-lime-500 text-black'
+      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
+          class="px-4 py-3 rounded-xl transition text-left cursor-pointer"
       >
-        Mein Pfand
+        Meine Transaktionen
       </button>
 
       <button
-          @click="activeTab = 'transactions'"
-          :class="activeTab === 'transactions'
-          ? 'bg-lime-500 text-black'
-          : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
-          class="px-4 py-2 rounded-xl transition text-left cursor-pointer"
+          @click="activeTab = 'settings'"
+          :class="activeTab === 'settings'
+      ? 'bg-lime-500 text-black'
+      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
+          class="px-4 py-3 rounded-xl transition text-left cursor-pointer mt-auto"
       >
-        Meine Transaktionen
+        Settings
       </button>
     </nav>
 
@@ -137,12 +161,16 @@ watch(showModal, async (newVal) => {
             >
               <td class="py-2 px-4">{{ tool.name }}</td>
               <td class="py-2 px-4 text-neutral-700 dark:text-neutral-300">{{ tool.description }}</td>
-              <td class="py-2 px-4">{{ tool.base_price }} €</td>
+              <td class="py-2 px-4">{{ euroFormat.format(tool.base_price) }}</td>
               <td class="py-2 px-4 text-neutral-700 dark:text-neutral-300">{{ tool.tool_condition }}</td>
-              <td class="py-2 px-4 font-medium text-lime-600 dark:text-lime-400">{{ tool.deposit }} €</td>
+              <td class="py-2 px-4 font-medium text-lime-600 dark:text-lime-400">{{
+                  euroFormat.format(tool.deposit)
+                }}
+              </td>
 
               <td class="py-2 px-4">
                 <div
+                    @click="clickedEdit(tool)"
                     class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition cursor-pointer"
                 >
                   <svg
@@ -194,87 +222,26 @@ watch(showModal, async (newVal) => {
         </div>
       </div>
 
-      <!-- Mein Pfand -->
-      <div v-if="activeTab === 'deposit'" class="text-neutral-600 dark:text-neutral-400">
-        Hier siehst du dein gesamtes Pfand. (Implementierung folgt)
-      </div>
-
+      <!-- Modal MyTools -->
+      <ToolCreate :new-tool="newTool" :show-modal="showModal" :usage-factor="usageFactor"
+                  :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showModal = false"
+                  @saved="loadMyTools"/>
+      <ToolEdit
+          :edit-tool="editTool" :show-modal="showEdit" :usage-factor="usageFactor"
+          :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showEdit = false"
+          @saved="loadMyTools"
+      />
       <!-- Meine Transaktionen -->
       <div v-if="activeTab === 'transactions'" class="text-neutral-600 dark:text-neutral-400">
         Hier siehst du deine Transaktionen. (Implementierung folgt)
       </div>
-    </div>
 
-    <!-- Modal -->
-    <transition name="fade">
-      <div v-if="showModal" class="fixed inset-0 z-50 flex justify-center items-center">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="showModal = false"></div>
-
-        <div
-            @click.stop
-            class="relative bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 w-11/12 max-w-lg shadow-2xl transition-all"
-        >
-          <button
-              @click="showModal = false"
-              class="absolute top-4 right-4 text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white text-3xl font-bold"
-          >
-            &times;
-          </button>
-
-          <h2 class="text-2xl font-bold text-lime-600 dark:text-lime-400 mb-4">Neues Tool</h2>
-
-          <div class="flex flex-col gap-3">
-            <p class="text-neutral-700 dark:text-neutral-300">Name:</p>
-            <input
-                v-model="newTool.name"
-                placeholder="Name"
-                class="px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border border-neutral-300 dark:border-neutral-700 placeholder-neutral-400 dark:placeholder-neutral-500"
-            />
-
-            <p class="text-neutral-700 dark:text-neutral-300">Beschreibung:</p>
-            <textarea
-                rows="4"
-                v-model="newTool.description"
-                placeholder="Beschreibung"
-                class="px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border border-neutral-300 dark:border-neutral-700 placeholder-neutral-400 dark:placeholder-neutral-500"
-            ></textarea>
-
-            <p class="text-neutral-700 dark:text-neutral-300">Preis:</p>
-            <input
-                v-model.number="newTool.base_price"
-                @input="calcDeposit()"
-                type="number"
-                placeholder="Preis"
-                class="px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border border-neutral-300 dark:border-neutral-700 placeholder-neutral-400 dark:placeholder-neutral-500"
-            />
-
-            <p class="text-neutral-700 dark:text-neutral-300">Kondition:</p>
-            <select
-                v-model="newTool.tool_condition"
-                @change="calcDeposit()"
-                class="px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white border border-neutral-300 dark:border-neutral-700"
-            >
-              <option v-for="c in conditions" :key="c">{{ c }}</option>
-            </select>
-
-            <p class="text-neutral-700 dark:text-neutral-300">Pfand:</p>
-            <input
-                v-model="newTool.deposit"
-                readonly
-                placeholder="Pfand"
-                class="px-4 py-2 rounded-xl bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600"
-            />
-
-            <button
-                @click="saveTool"
-                class="bg-lime-500 hover:bg-lime-400 text-black px-4 py-2 rounded-xl font-semibold hover:scale-105 transition"
-            >
-              Speichern
-            </button>
-          </div>
-        </div>
+      <!-- Settings -->
+      <div v-if="activeTab === 'settings'" class="text-neutral-600 dark:text-neutral-400">
+        <Settings/>
       </div>
-    </transition>
+
+    </div>
   </div>
 </template>
 

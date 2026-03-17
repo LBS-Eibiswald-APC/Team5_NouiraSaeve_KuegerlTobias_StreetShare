@@ -4,7 +4,7 @@
       <h1 class="text-2xl text-black dark:text-white font-bold tracking-tight">
         Street<span class="dark:text-lime-400 text-lime-500">Share</span>
       </h1>
-      <div class="space-x-6 md:block">
+      <div class="space-x-6 flex">
         <button @click="router.push('/register')" class="bg-lime-400 text-black px-5 py-2 rounded-full font-semibold hover:scale-105 transition cursor-pointer">
           Jetzt starten
         </button>
@@ -13,8 +13,6 @@
         </button>
         <ToggleTheme/>
       </div>
-
-
     </nav>
     <section class="text-center py-28 px-6">
       <h2 class="text-5xl text-black dark:text-white md:text-6xl font-bold leading-tight max-w-4xl mx-auto">
@@ -104,4 +102,5 @@
 
 <script setup>
 import router from "../../router/index.js";
+import ToggleTheme from "@/components/ToggleTheme.vue";
 </script>

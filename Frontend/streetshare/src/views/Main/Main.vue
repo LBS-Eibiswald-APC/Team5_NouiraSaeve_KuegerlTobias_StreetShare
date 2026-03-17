@@ -50,8 +50,11 @@ async function applyFilters() {
 
 <template>
   <div class="min-h-screen text-neutral-900 dark:text-white font-sans px-6 py-10">
+    Build Text Search
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 cursor-pointer">
-
+      <div  class="bg-white dark:bg-neutral-900" style="height: 50px">
+        <input>
+      </div>
       <div
           class="md:w-1/4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-6 rounded-2xl shadow-lg space-y-4 mt-12"
           style="height: 350px"
@@ -87,7 +90,6 @@ async function applyFilters() {
           Anwenden
         </button>
       </div>
-
       <div class="md:w-3/4 flex flex-col gap-4">
         <div class="flex justify-end items-center space-x-3">
           <span class="text-neutral-700 dark:text-neutral-300">Pro Seite:</span>

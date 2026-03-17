@@ -24,16 +24,9 @@ def get_tools(db: Session = Depends(get_db)):
     return transaction_crud.get_all(db)
 
 
-@router.get("/{tool_id}", response_model=TransactionResponse)
+@router.get("/tool/{tool_id}", response_model=List[TransactionResponse])
 def get_tool(tool_id: int, db: Session = Depends(get_db)):
-    tool = transaction_crud.get(db, tool_id)
-
-    if not tool:
-        raise HTTPException(
-            status_code=404,
-            detail="Tool not found"
-        )
-
+    tool = transaction_crud.get_all_tools(db, tool_id)
     return tool
 
 
