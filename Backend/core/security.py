@@ -16,9 +16,16 @@ def create_access_token(user, expires_delta: timedelta | None = None):
     to_encode = {
         "sub": str(user.id),
         "role": user.role.name,
+        "email": user.email,
         "display_name": user.display_name,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "phone": user.phone,
+        "street": user.street,
+        "house_nr": user.house_nr,
+        "zip": user.zip,
+        "city": user.city,
+        "country": user.country,
         "exp": expire
     }
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

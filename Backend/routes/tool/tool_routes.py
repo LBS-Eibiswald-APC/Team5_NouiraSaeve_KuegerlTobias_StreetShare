@@ -5,8 +5,7 @@ from typing import List, Dict
 from Backend.core.database import get_db
 from Backend.crud.tool.crud_tool import tool_crud
 from Backend.crud.user.crud_user import user_crud
-from Backend.schemas.tool.tool_schema import ToolCreate, ToolResponse
-
+from Backend.schemas.tool.tool_schema import ToolCreate, ToolResponse, ToolUpdate
 
 router = APIRouter(
     prefix="/tools",
@@ -17,6 +16,18 @@ router = APIRouter(
 @router.post("/", response_model=ToolCreate)
 def create_tool(tool: ToolCreate, db: Session = Depends(get_db)):
     return tool_crud.create(db, tool)
+
+@router.put("/{tool_id}", response_model=ToolUpdate)
+def update_tool(tool_id: int, tool: ToolUpdate, db: Session = Depends(get_db)):
+    db_tool = tool_crud.get(db, tool_id)
+
+    if not db_tool:
+        raise HTTPException(
+            status_code=404,
+            detail="Tool not found"
+        )
+
+    return tool_crud.update(db, db_obj=db_tool, obj_in=tool)
 
 
 @router.get("/", response_model=Dict)

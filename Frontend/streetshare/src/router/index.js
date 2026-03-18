@@ -4,8 +4,8 @@ import LoginView from "@/views/Login/Login.vue";
 import RegisterView from "@/views/Login/Register.vue";
 import LandingPage from "@/views/LandingPage/LandingPage.vue";
 import MainPage from "@/views/Main/Main.vue";
-import UserMe from "@/views/User/UserMe.vue";
 import {useAuthStore} from "@/store/authStore.js";
+import Dashboard from "@/views/User/Dashboard.vue";
 
 const routes = [
     {
@@ -33,9 +33,9 @@ const routes = [
         meta: {requiresAuth: false, showNav: null }
     },
     {
-        path: "/user/me",
-        name: "user_me",
-        component: UserMe,
+        path: "/dashboard",
+        name: "dashboard",
+        component: Dashboard,
         meta: {requiresAuth: true, showNav: false }
     }
 ];

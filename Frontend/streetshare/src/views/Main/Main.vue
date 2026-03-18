@@ -5,6 +5,10 @@ import { useToolsStore } from "@/store/toolsStore";
 const toolStore = useToolsStore();
 const selectedTool = ref(null);
 const showModal = ref(false);
+const euroFormat = new Intl.NumberFormat('de-DE', {
+  style: 'currency',
+  currency: 'EUR',
+});
 
 onMounted(() => {
   toolStore.fetchTools();
@@ -127,7 +131,7 @@ async function applyFilters() {
             </div>
 
             <div class="flex justify-between items-center mt-2">
-              <span class="font-bold text-lime-600 dark:text-lime-400">{{ tool.deposit ?? 0 }}€ Pfand</span>
+              <span class="font-bold text-lime-600 dark:text-lime-400">{{ euroFormat.format(tool.deposit) ?? 0 }} Pfand</span>
             </div>
 
             <div class="flex justify-between items-center mt-2">

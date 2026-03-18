@@ -29,7 +29,9 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 tool_condition=t.tool_condition,
                 creator_display_name=t.creator.display_name if t.creator else None,
                 creator_city=t.creator.city if t.creator else None,
-                creator_country=t.creator.country if t.creator else None
+                creator_country=t.creator.country if t.creator else None,
+                deleted=t.deleted,
+                deleted_at=t.deleted_at
             ))
         return response
 
@@ -64,7 +66,9 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 tool_condition=t.tool_condition,
                 creator_display_name=t.creator.display_name if t.creator else None,
                 creator_city=t.creator.city if t.creator else None,
-                creator_country=t.creator.country if t.creator else None
+                creator_country=t.creator.country if t.creator else None,
+                deleted=t.deleted,
+                deleted_at=t.deleted_at
             ))
 
         return {"tools": response, "total": total}

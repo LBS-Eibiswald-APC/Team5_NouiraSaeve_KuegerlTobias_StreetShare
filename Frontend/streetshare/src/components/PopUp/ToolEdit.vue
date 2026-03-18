@@ -14,6 +14,7 @@ const emit = defineEmits(["close", "saved"]);
 const conditions = ["Neu", "Minimal abgenutzt", "Gebraucht", "Gut abgenutzt", "Defekt"];
 
 const localTool = reactive({
+  id: null,
   name: "",
   description: "",
   base_price: 0,
@@ -44,10 +45,10 @@ function calcDeposit() {
   localTool.deposit = Number(deposit.toFixed(2));
 }
 
-async function saveTool() {
+async function editTool() {
   calcDeposit();
 
-  const success = await props.toolStore.createTool({...localTool});
+  const success = await props.toolStore.editTool({...localTool});
 
   if (success) {
     emit("saved");
@@ -67,7 +68,7 @@ async function saveTool() {
 <template>
   <transition name="fade">
     <div v-if="showModal" class="fixed inset-0 z-50 flex justify-center items-center">
-      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="emit('close')"></div>
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
 
       <div
           @click.stop
@@ -125,7 +126,7 @@ async function saveTool() {
           />
 
           <button
-              @click="saveTool"
+              @click="editTool"
               class="bg-lime-500 hover:bg-lime-400 text-black px-4 py-2 rounded-xl font-semibold hover:scale-105 transition"
           >
             Speichern

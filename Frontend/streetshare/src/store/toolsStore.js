@@ -86,6 +86,27 @@ export const useToolsStore = defineStore("tools", {
             }
             return false
         },
-
+        async editTool(tool) {
+            try {
+                const authStore = useAuthStore();
+                const userId = authStore.user_id ?? null;
+                if (!userId) throw new Error("Kein eingeloggter User");
+                await api.put(`/tools/${tool.id}`, {
+                    ...tool,
+                    created_by: userId,
+                });
+                return true
+            } catch (e) {
+                console.log(e)
+                return false
+            }
+        },
+        async deleteTool(tool_id) {
+            try {
+                return await api.delete(`/tools/${tool_id}`)
+            } catch (e) {
+                console.log(e)
+            }
+        }
     }
 });

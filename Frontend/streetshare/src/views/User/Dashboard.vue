@@ -1,10 +1,14 @@
 <script setup>
 import {ref, computed, watch, onMounted} from "vue";
 import {useToolsStore} from "@/store/toolsStore";
-import {useAuthStore} from "@/store/authStore.js";
 import ToolCreate from "@/components/PopUp/ToolCreate.vue";
 import ToolEdit from "@/components/PopUp/ToolEdit.vue";
 import {useTransactionsStore} from "@/store/transactionsStore.js";
+import {useToast} from 'vue-toast-notification'
+import Settings from "@/views/User/Settings.vue";
+import ConfirmationPopUp from "@/components/PopUp/ConfirmationPopUp.vue";
+
+const $toast = useToast()
 
 const toolStore = useToolsStore();
 const transactionsStore = useTransactionsStore();
@@ -27,6 +31,7 @@ const newTool = ref({
 const activeTab = ref("entries");
 
 const editTool = ref();
+const showDelete = ref();
 
 const usageFactor = {
   "Neu": 0.35,
@@ -49,38 +54,60 @@ function calcDeposit() {
   newTool.value.deposit = deposit.toFixed(2);
 }
 
-async function loadMyTools() {
+async function loadMyTools(toolUpdated) {
+  if (toolUpdated) {
+    $toast.success("Erfolgreich die Tools aktualisiert!", {"position": "top-right"});
+  }
   myTools.value = await toolStore.getUserTools();
 }
 
-import { useToast } from 'vue-toast-notification'
-import Settings from "@/views/User/Settings.vue";
-
-const $toast = useToast()
-
 async function clickedEdit(tool) {
   const req = await transactionsStore.getTransactionsByToolId(tool.id);
-  console.log(req)
   if (req && req.length <= 0) {
     editTool.value = tool;
     showEdit.value = true;
   } else {
-    $toast.open({
-      message: 'Es gibt schon eine Transaktion!',
-      type: 'warning'
-    })
+    $toast.warning('Es gibt schon eine Transaktion!', {"position": "top-right"});
+  }
+}
+
+const deletedTool = ref();
+
+async function deleteTool(tool) {
+  const req = await transactionsStore.getTransactionsByToolId(tool.id);
+  if (req && req.length <= 0) {
+    showDelete.value = true;
+    deletedTool.value = tool;
+  } else {
+    /* Hier müssen wir unterscheiden zwischen ob es eine akutelle Transaktion gibt oder nicht */
+    /* Wenn es eine gibt kommt diese Error Message */
+    $toast.warning('Es gibt schon eine Transaktion!', {"position": "top-right"});
+    /* Wenn es eine Transaktion gibt aber die schon Vergangenheit ist einfach deleted True setzen */
+  }
+}
+
+async function deleteToolEntry() {
+  try {
+    const req = await toolStore.deleteTool(deletedTool.value.id);
+    if (req.status === 200) {
+      showDelete.value = false;
+      await loadMyTools(false);
+      $toast.success("Erfolgreich den Eintrag gelöscht!", {"position": "top-right"});
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
 const myTools = ref([]);
 
 onMounted(async () => {
-  await loadMyTools();
+  await loadMyTools(false);
 });
 
 watch(activeTab, async (newVal) => {
   if (newVal === "entries") {
-    await loadMyTools();
+    await loadMyTools(false);
   }
 });
 watch(showModal, async (newVal) => {
@@ -91,8 +118,7 @@ watch(showModal, async (newVal) => {
 </script>
 <template>
   <div
-      class="h-screen overflow-hidden text-neutral-900 dark:text-white font-sans px-6 flex gap-6">
-    <!-- Sidebar -->
+      class="h-screen overflow-auto text-neutral-900 dark:text-white font-sans flex gap-6">
     <nav
         class="w-60 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 flex flex-col gap-y-2 ml-20">
       <h2 class="text-xl font-bold text-lime-600 dark:text-lime-400 mb-2">Dashboard</h2>
@@ -161,9 +187,9 @@ watch(showModal, async (newVal) => {
             >
               <td class="py-2 px-4">{{ tool.name }}</td>
               <td class="py-2 px-4 text-neutral-700 dark:text-neutral-300">{{ tool.description }}</td>
-              <td class="py-2 px-4">{{ euroFormat.format(tool.base_price) }}</td>
+              <td class="py-2 px-4 text-right">{{ euroFormat.format(tool.base_price) }}</td>
               <td class="py-2 px-4 text-neutral-700 dark:text-neutral-300">{{ tool.tool_condition }}</td>
-              <td class="py-2 px-4 font-medium text-lime-600 dark:text-lime-400">{{
+              <td class="py-2 px-4 font-medium text-lime-600 dark:text-lime-400 text-right">{{
                   euroFormat.format(tool.deposit)
                 }}
               </td>
@@ -191,8 +217,8 @@ watch(showModal, async (newVal) => {
               </td>
 
               <td class="py-2 px-4">
-                <div
-                    class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-600/20 dark:hover:text-red-400 transition cursor-pointer"
+                <div @click="deleteTool(tool)"
+                     class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-600/20 dark:hover:text-red-400 transition cursor-pointer"
                 >
                   <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -225,11 +251,11 @@ watch(showModal, async (newVal) => {
       <!-- Modal MyTools -->
       <ToolCreate :new-tool="newTool" :show-modal="showModal" :usage-factor="usageFactor"
                   :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showModal = false"
-                  @saved="loadMyTools"/>
+                  @saved="loadMyTools(true)"/>
       <ToolEdit
           :edit-tool="editTool" :show-modal="showEdit" :usage-factor="usageFactor"
           :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showEdit = false"
-          @saved="loadMyTools"
+          @saved="loadMyTools(true)"
       />
       <!-- Meine Transaktionen -->
       <div v-if="activeTab === 'transactions'" class="text-neutral-600 dark:text-neutral-400">
@@ -242,6 +268,14 @@ watch(showModal, async (newVal) => {
       </div>
 
     </div>
+    <ConfirmationPopUp
+        v-if="showDelete"
+        title="Speichern?"
+        message="Willst du den Eintrag löschen?"
+        button-save-style="warning"
+        @close="showDelete = false"
+        @confirm="deleteToolEntry"
+    />
   </div>
 </template>
 

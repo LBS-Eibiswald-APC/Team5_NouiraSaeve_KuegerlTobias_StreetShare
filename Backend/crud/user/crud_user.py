@@ -47,6 +47,14 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
             last_name: str = payload.get("last_name")
             first_name: str = payload.get("first_name")
             display_name: str = payload.get("display_name")
+            phone: str = payload.get("phone")
+            street: str = payload.get("street")
+            house_nr: str = payload.get("house_nr")
+            zip: str = payload.get("zip")
+            city: str = payload.get("city")
+            country: str = payload.get("country")
+            email: str = payload.get("email")
+
             if user_id is None:
                 raise HTTPException(status_code=401, detail="Invalid token")
             return {
@@ -55,6 +63,13 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
                 "display_name": display_name,
                 "last_name": last_name,
                 "first_name": first_name,
+                "phone": phone,
+                "street": street,
+                "house_nr": house_nr,
+                "zip": zip,
+                "city": city,
+                "country": country,
+                "email": email,
             }
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, ForeignKey, func
+from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, ForeignKey, func, Boolean
 from sqlalchemy.orm import relationship
 from core.database import Base
 
@@ -14,5 +14,6 @@ class Tool(Base):
     tool_condition = Column(String(255), nullable=True)
     created_at = Column(DateTime, server_default=func.now())
     created_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"))
-
+    deleted = Column(Integer, default=0)
+    deleted_at = Column(DateTime, default=None)
     creator = relationship("User", backref="tools")

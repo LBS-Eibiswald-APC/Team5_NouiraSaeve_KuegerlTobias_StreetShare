@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, ForeignKey, func
+from sqlalchemy import Column, Integer, String, BLOB, DateTime, DECIMAL, ForeignKey, func
 from sqlalchemy.orm import relationship
 from Backend.core.database import Base
 
@@ -13,3 +13,5 @@ class Transaction(Base):
     start_date = Column(DateTime, server_default=func.now())
     end_date = Column(DateTime, server_default=func.now())
     created_at = Column(DateTime, server_default=func.now())
+    picture_before = Column(BLOB, nullable=True)
+    picture_after = Column(BLOB, nullable=True)

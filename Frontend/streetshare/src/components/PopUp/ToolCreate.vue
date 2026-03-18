@@ -67,7 +67,7 @@ async function saveTool() {
 <template>
   <transition name="fade">
     <div v-if="showModal" class="fixed inset-0 z-50 flex justify-center items-center">
-      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="emit('close')"></div>
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="emit('close')"></div>
 
       <div
           @click.stop

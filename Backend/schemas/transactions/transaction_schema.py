@@ -10,6 +10,8 @@ class TransactionCreate(BaseModel):
     start_date: datetime
     end_date: datetime
     created_at: datetime | None
+    picture_before: bytes | None = None
+    picture_after: bytes | None = None
 
 class TransactionUpdate(BaseModel):
     tool_id: int | None = None
@@ -18,6 +20,8 @@ class TransactionUpdate(BaseModel):
     start_date: datetime | None = None
     end_date: datetime | None = None
     created_at: datetime | None = None
+    picture_before: bytes | None = None
+    picture_after: bytes | None = None
 
 class TransactionResponse(BaseModel):
     id: int
@@ -27,5 +31,7 @@ class TransactionResponse(BaseModel):
     start_date: datetime | None
     end_date: datetime | None
     created_at: datetime | None
+    picture_before: bytes | None = None
+    picture_after: bytes | None = None
     class Config:
         from_attributes = True

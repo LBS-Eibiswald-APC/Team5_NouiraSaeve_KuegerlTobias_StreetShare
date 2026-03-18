@@ -20,7 +20,7 @@ const fetchUser = async () => {
 onMounted(fetchUser);
 
 const goLogin = () => router.push("/login");
-const goUserPage = () => router.push("/user/me");
+const goUserPage = () => router.push("/dashboard");
 const goMain = () => router.push("/main");
 
 const logout = () => {
