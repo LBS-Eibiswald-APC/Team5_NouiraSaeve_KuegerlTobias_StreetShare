@@ -7,6 +7,7 @@ import {useTransactionsStore} from "@/store/transactionsStore.js";
 import {useToast} from 'vue-toast-notification'
 import Settings from "@/views/User/Settings.vue";
 import ConfirmationPopUp from "@/components/PopUp/ConfirmationPopUp.vue";
+import Requests from "@/views/User/Requests.vue";
 
 const $toast = useToast()
 
@@ -134,6 +135,15 @@ watch(showModal, async (newVal) => {
       </button>
 
       <button
+          @click="activeTab = 'requests'"
+          :class="activeTab === 'requests'
+      ? 'bg-lime-500 text-black'
+      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
+          class="px-4 py-3 rounded-xl transition text-left cursor-pointer"
+      >
+        Meine Anfragen
+      </button>
+      <button
           @click="activeTab = 'transactions'"
           :class="activeTab === 'transactions'
       ? 'bg-lime-500 text-black'
@@ -142,7 +152,6 @@ watch(showModal, async (newVal) => {
       >
         Meine Transaktionen
       </button>
-
       <button
           @click="activeTab = 'settings'"
           :class="activeTab === 'settings'
@@ -257,6 +266,12 @@ watch(showModal, async (newVal) => {
           :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showEdit = false"
           @saved="loadMyTools(true)"
       />
+
+      <!-- Meine Anfragen -->
+      <div v-if="activeTab === 'requests'" class="text-neutral-600 dark:text-neutral-400">
+        <Requests/>
+      </div>
+
       <!-- Meine Transaktionen -->
       <div v-if="activeTab === 'transactions'" class="text-neutral-600 dark:text-neutral-400">
         Hier siehst du deine Transaktionen. (Implementierung folgt)

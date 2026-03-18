@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, joinedload
-from crud.base import CRUDBase
-from model.tools.tools_model import Tool
-from schemas.tool.tool_schema import ToolCreate, ToolUpdate
+from Backend.crud.base import CRUDBase
+from Backend.model.tools.tools_model import Tool
+from Backend.schemas.tool.tool_schema import ToolCreate, ToolUpdate
 
 from Backend.model.user.user_model import User
 from Backend.schemas.tool.tool_schema import ToolResponse
@@ -24,6 +24,7 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 id=t.id,
                 name=t.name,
                 description=t.description,
+                tool_image=t.tool_image,
                 base_price=float(t.base_price) if t.base_price else None,
                 deposit=float(t.deposit) if t.deposit else None,
                 tool_condition=t.tool_condition,
@@ -61,6 +62,7 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 id=t.id,
                 name=t.name,
                 description=t.description,
+                tool_image=t.tool_image,
                 base_price=float(t.base_price) if t.base_price else None,
                 deposit=float(t.deposit) if t.deposit else None,
                 tool_condition=t.tool_condition,

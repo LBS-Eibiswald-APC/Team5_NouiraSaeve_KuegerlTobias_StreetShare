@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from core.database import get_db
-from crud.role.crud_role import role_crud
-from schemas.role.role_schema import RoleCreate, RoleResponse
+from Backend.core.database import get_db
+from Backend.crud.role.crud_role import role_crud
+from Backend.schemas.role.role_schema import RoleCreate, RoleResponse
 
 from Backend.core.dependencies import require_role
 

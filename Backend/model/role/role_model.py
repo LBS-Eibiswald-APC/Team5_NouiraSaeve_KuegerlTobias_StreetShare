@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, func
-from core.database import Base
+from Backend.core.database import Base
 
 
 class Role(Base):
