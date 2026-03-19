@@ -9,3 +9,4 @@ bcrypt==4.1.2
 pydantic[email]==2.6.1
 python-jose==3.5.0
 python-multipart==0.0.22
+pytest==9.0.2
