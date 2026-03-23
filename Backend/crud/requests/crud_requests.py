@@ -16,7 +16,7 @@ class CRUDRequests(CRUDBase[Requests, RequestsCreate, RequestsUpdate]):
             )
             .join(Tool, Requests.tool_id == Tool.id)
             .join(User, Requests.borrower_id == User.id)
-            .filter(Requests.lender_id == current_user["id"])
+            .filter(Requests.lender_id == current_user.id)
             .all()
         )
 
@@ -27,7 +27,7 @@ class CRUDRequests(CRUDBase[Requests, RequestsCreate, RequestsUpdate]):
                     id=req.id,
                     tool_id=req.tool_id,
                     tool_name=tool_name,
-                    to_respond_id=req.to_respond_it,
+                    to_respond_id=req.to_respond_id,
                     borrower_id=req.borrower_id,
                     borrower_username=borrower_username,
                     lender_id=req.lender_id,
@@ -35,6 +35,40 @@ class CRUDRequests(CRUDBase[Requests, RequestsCreate, RequestsUpdate]):
                     end_date=req.end_date,
                     created_at=req.created_at,
                     message=req.message,
+                )
+            )
+
+        return response
+
+    def get_sending_user_requests(self, current_user, db: Session):
+        query = (
+            db.query(
+                Requests,
+                Tool.name.label("name"),
+                User.display_name.label("borrower_username")
+            )
+            .join(Tool, Requests.tool_id == Tool.id)
+            .join(User, Requests.lender_id == User.id)
+            .filter(Requests.borrower_id == current_user.id)
+            .all()
+        )
+
+        response = []
+        for req, tool_name, borrower_username in query:
+            response.append(
+                RequestsResponse(
+                    id=req.id,
+                    tool_id=req.tool_id,
+                    tool_name=tool_name,
+                    to_respond_id=req.to_respond_id,
+                    borrower_id=req.borrower_id,
+                    borrower_username=borrower_username,
+                    lender_id=req.lender_id,
+                    start_date=req.start_date,
+                    end_date=req.end_date,
+                    created_at=req.created_at,
+                    message=req.message,
+                    status=req.status,
                 )
             )
 

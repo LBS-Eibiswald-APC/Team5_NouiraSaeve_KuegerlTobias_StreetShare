@@ -1,307 +1,284 @@
 <script setup>
-import {ref, computed, watch, onMounted} from "vue";
-import {useToolsStore} from "@/store/toolsStore";
-import ToolCreate from "@/components/PopUp/ToolCreate.vue";
-import ToolEdit from "@/components/PopUp/ToolEdit.vue";
-import {useTransactionsStore} from "@/store/transactionsStore.js";
-import {useToast} from 'vue-toast-notification'
+import {computed, ref, onMounted, onBeforeUnmount, watch, onBeforeMount} from "vue";
 import Settings from "@/views/User/Settings.vue";
-import ConfirmationPopUp from "@/components/PopUp/ConfirmationPopUp.vue";
 import Requests from "@/views/User/Requests.vue";
+import Entries from "@/views/User/Entries.vue";
+import SendedRequests from "@/views/User/SendedRequests.vue";
 
-const $toast = useToast()
-
-const toolStore = useToolsStore();
-const transactionsStore = useTransactionsStore();
-const euroFormat = new Intl.NumberFormat('de-DE', {
-  style: 'currency',
-  currency: 'EUR',
-});
-const showModal = ref(false);
-const showEdit = ref(false);
-
-const newTool = ref({
-  id: null,
-  name: "",
-  description: "",
-  base_price: 0,
-  tool_condition: "Neu",
-  deposit: 0,
-});
+import {
+  BIconGrid,
+  BIconInbox,
+  BIconArrowLeftRight,
+  BIconGear,
+  BIconList,
+  BIconX
+} from "bootstrap-icons-vue";
 
 const activeTab = ref("entries");
+const mobileNavOpen = ref(false);
+const isMobile = ref(false);
 
-const editTool = ref();
-const showDelete = ref();
+const tabs = [
+  {
+    key: "entries",
+    label: "Meine Einträge",
+    icon: BIconGrid,
+    view: Entries,
+  },
+  {
+    key: "requests",
+    label: "Meine Anfragen",
+    icon: BIconInbox,
+    view: Requests,
+  },
+  {
+    key: "sendedRequests",
+    label: "Gesendete Anfragen",
+    icon: BIconInbox,
+    view: SendedRequests,
+  },
+  {
+    key: "transactions",
+    label: "Meine Transaktionen",
+    icon: BIconArrowLeftRight,
+    view: "",
+  },
+  {
+    key: "settings",
+    label: "Einstellungen",
+    icon: BIconGear,
+    view: Settings,
+  },
+];
 
-const usageFactor = {
-  "Neu": 0.35,
-  "Minimal abgenutzt": 0.30,
-  "Gebraucht": 0.25,
-  "Gut abgenutzt": 0.2,
-  "Defekt": 0.1,
-}
-
-const week_multiplier = 1
-
-function calcDeposit() {
-  const factor = usageFactor[newTool.value.tool_condition]
-  let deposit = newTool.value.base_price * factor * week_multiplier
-  if (newTool.value.base_price < 100) {
-    deposit *= 0.8
-  } else {
-    deposit *= 0.7
-  }
-  newTool.value.deposit = deposit.toFixed(2);
-}
-
-async function loadMyTools(toolUpdated) {
-  if (toolUpdated) {
-    $toast.success("Erfolgreich die Tools aktualisiert!", {"position": "top-right"});
-  }
-  myTools.value = await toolStore.getUserTools();
-}
-
-async function clickedEdit(tool) {
-  const req = await transactionsStore.getTransactionsByToolId(tool.id);
-  if (req && req.length <= 0) {
-    editTool.value = tool;
-    showEdit.value = true;
-  } else {
-    $toast.warning('Es gibt schon eine Transaktion!', {"position": "top-right"});
-  }
-}
-
-const deletedTool = ref();
-
-async function deleteTool(tool) {
-  const req = await transactionsStore.getTransactionsByToolId(tool.id);
-  if (req && req.length <= 0) {
-    showDelete.value = true;
-    deletedTool.value = tool;
-  } else {
-    /* Hier müssen wir unterscheiden zwischen ob es eine akutelle Transaktion gibt oder nicht */
-    /* Wenn es eine gibt kommt diese Error Message */
-    $toast.warning('Es gibt schon eine Transaktion!', {"position": "top-right"});
-    /* Wenn es eine Transaktion gibt aber die schon Vergangenheit ist einfach deleted True setzen */
-  }
-}
-
-async function deleteToolEntry() {
-  try {
-    const req = await toolStore.deleteTool(deletedTool.value.id);
-    if (req.status === 200) {
-      showDelete.value = false;
-      await loadMyTools(false);
-      $toast.success("Erfolgreich den Eintrag gelöscht!", {"position": "top-right"});
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-const myTools = ref([]);
-
-onMounted(async () => {
-  await loadMyTools(false);
+const activeTabObject = computed(() => {
+  return tabs.find((tab) => tab.key === activeTab.value) ?? tabs[0];
 });
 
-watch(activeTab, async (newVal) => {
-  if (newVal === "entries") {
-    await loadMyTools(false);
-  }
+const activeTitle = computed(() => {
+  return activeTabObject.value.label;
 });
-watch(showModal, async (newVal) => {
-  if (!newVal) {
-    newTool.value = {name: "", description: "", base_price: 0, tool_condition: "Neu", deposit: 0};
+
+const activeView = computed(() => {
+  return activeTabObject.value.view;
+});
+
+function handleResize() {
+  isMobile.value = window.innerWidth < 1024;
+  if (!isMobile.value) {
+    mobileNavOpen.value = false;
+  }
+}
+
+function selectTab(tabKey) {
+  activeTab.value = tabKey;
+  localStorage.setItem("activeTab", activeTab.value);
+
+  if (isMobile.value) {
+    mobileNavOpen.value = false;
+  }
+}
+
+function toggleMobileNav() {
+  mobileNavOpen.value = !mobileNavOpen.value;
+}
+
+function closeMobileNav() {
+  mobileNavOpen.value = false;
+}
+
+function handleEscape(e) {
+  if (e.key === "Escape") {
+    closeMobileNav();
+  }
+}
+
+onBeforeMount(() => {
+  const activeTabStorage = localStorage.getItem("activeTab");
+  const tabExists = tabs.some((tab) => tab.key === activeTabStorage);
+
+  if (activeTabStorage && tabExists) {
+    activeTab.value = activeTabStorage;
+  } else {
+    localStorage.setItem("activeTab", activeTab.value);
   }
 })
+
+onMounted(() => {
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  window.addEventListener("keydown", handleEscape);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize);
+  window.removeEventListener("keydown", handleEscape);
+});
+
+watch(activeTab, () => {
+  if (isMobile.value) {
+    closeMobileNav();
+  }
+});
 </script>
+
 <template>
-  <div
-      class="h-screen overflow-auto text-neutral-900 dark:text-white font-sans flex gap-6">
-    <nav
-        class="w-60 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 flex flex-col gap-y-2 ml-20">
-      <h2 class="text-xl font-bold text-lime-600 dark:text-lime-400 mb-2">Dashboard</h2>
-
-      <button
-          @click="activeTab = 'entries'"
-          :class="activeTab === 'entries'
-      ? 'bg-lime-500 text-black'
-      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
-          class="px-4 py-3 rounded-xl transition text-left cursor-pointer"
+  <div class="min-h-screen text-neutral-900 dark:text-white font-sans">
+    <div class="mx-auto flex max-w-[1600px] gap-6 px-4 py-4 sm:px-6  lg:py-10">
+      <!-- Desktop Sidebar -->
+      <aside
+          class="hidden h-screen lg:block lg:w-72 shrink-0 rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sticky top-8"
       >
-        Meine Einträge
-      </button>
+        <div class="mb-4 px-2">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-lime-500">
+            Übersicht
+          </p>
+          <h2 class="mt-2 text-2xl font-bold tracking-tight">
+            Dashboard
+          </h2>
+          <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+            Verwalte deine Einträge, Anfragen und Einstellungen zentral.
+          </p>
+        </div>
 
-      <button
-          @click="activeTab = 'requests'"
-          :class="activeTab === 'requests'
-      ? 'bg-lime-500 text-black'
-      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
-          class="px-4 py-3 rounded-xl transition text-left cursor-pointer"
-      >
-        Meine Anfragen
-      </button>
-      <button
-          @click="activeTab = 'transactions'"
-          :class="activeTab === 'transactions'
-      ? 'bg-lime-500 text-black'
-      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
-          class="px-4 py-3 rounded-xl transition text-left cursor-pointer"
-      >
-        Meine Transaktionen
-      </button>
-      <button
-          @click="activeTab = 'settings'"
-          :class="activeTab === 'settings'
-      ? 'bg-lime-500 text-black'
-      : 'bg-transparent text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-lime-500/20'"
-          class="px-4 py-3 rounded-xl transition text-left cursor-pointer mt-auto"
-      >
-        Settings
-      </button>
-    </nav>
+        <nav class="flex flex-col gap-2">
+          <button
+              v-for="tab in tabs"
+              :key="tab.key"
+              @click="selectTab(tab.key)"
+              :class="
+              activeTab === tab.key
+                ? 'bg-lime-500 text-black shadow-sm'
+                : 'text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800'
+            "
+              class="flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium transition"
+          >
+            <component :is="tab.icon" class="text-base shrink-0" />
+            <span class="truncate">{{ tab.label }}</span>
+          </button>
+        </nav>
+      </aside>
 
-    <!-- Content -->
-    <div class="flex-1 flex flex-col gap-6">
-      <!-- Einträge Tab -->
-      <div v-if="activeTab === 'entries'" class="flex flex-col gap-4">
-        <button
-            @click="showModal = true"
-            class="bg-lime-500 hover:bg-lime-400 text-black rounded-xl px-4 py-2 font-semibold hover:scale-105 transition w-48"
-        >
-          Eintrag hinzufügen
-        </button>
-
-        <!-- Tools Tabelle -->
+      <!-- Main Content -->
+      <div class="flex-1 min-w-0 flex flex-col gap-4 lg:gap-6">
+        <!-- Mobile Topbar -->
         <div
-            class="overflow-x-auto bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 shadow-lg">
-          <table class="w-full text-left">
-            <thead>
-            <tr class="border-b border-neutral-300 dark:border-neutral-700">
-              <th class="py-2 px-4">Name</th>
-              <th class="py-2 px-4">Beschreibung</th>
-              <th class="py-2 px-4">Preis</th>
-              <th class="py-2 px-4">Kondition</th>
-              <th class="py-2 px-4">Pfand</th>
-            </tr>
-            </thead>
+            class="lg:hidden sticky top-0 z-30 rounded-2xl border border-neutral-200 bg-white/90 backdrop-blur px-4 py-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/90"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-lime-500">
+                Dashboard
+              </p>
+              <h1 class="truncate text-lg font-bold">
+                {{ activeTitle }}
+              </h1>
+            </div>
 
-            <tbody>
-            <tr
-                v-for="tool in myTools"
-                :key="tool.id"
-                class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+            <button
+                @click="toggleMobileNav"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-neutral-200 bg-white text-neutral-800 shadow-sm transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:hover:bg-neutral-800"
+                aria-label="Menü öffnen"
             >
-              <td class="py-2 px-4">{{ tool.name }}</td>
-              <td class="py-2 px-4 text-neutral-700 dark:text-neutral-300">{{ tool.description }}</td>
-              <td class="py-2 px-4 text-right">{{ euroFormat.format(tool.base_price) }}</td>
-              <td class="py-2 px-4 text-neutral-700 dark:text-neutral-300">{{ tool.tool_condition }}</td>
-              <td class="py-2 px-4 font-medium text-lime-600 dark:text-lime-400 text-right">{{
-                  euroFormat.format(tool.deposit)
-                }}
-              </td>
+              <BIconList class="text-xl" />
+            </button>
+          </div>
+        </div>
 
-              <td class="py-2 px-4">
-                <div
-                    @click="clickedEdit(tool)"
-                    class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition cursor-pointer"
-                >
-                  <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5"
-                  >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                    />
-                  </svg>
-                </div>
-              </td>
+        <!-- Mobile Overlay -->
+        <transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+          <div
+              v-if="mobileNavOpen"
+              class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+              @click="closeMobileNav"
+          />
+        </transition>
 
-              <td class="py-2 px-4">
-                <div @click="deleteTool(tool)"
-                     class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-600/20 dark:hover:text-red-400 transition cursor-pointer"
-                >
-                  <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5"
-                  >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                    />
-                  </svg>
-                </div>
-              </td>
-            </tr>
+        <!-- Mobile Drawer -->
+        <transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="-translate-x-full"
+            enter-to-class="translate-x-0"
+            leave-active-class="transition duration-200 ease-in"
+            leave-from-class="translate-x-0"
+            leave-to-class="-translate-x-full"
+        >
+          <aside
+              v-if="mobileNavOpen"
+              class="fixed left-0 top-0 z-50 flex h-full w-[85%] max-w-[320px] flex-col border-r border-neutral-200 bg-white p-4 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 lg:hidden"
+          >
+            <div class="mb-4 flex items-start justify-between gap-3 px-2">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-lime-500">
+                  Übersicht
+                </p>
+                <h2 class="mt-2 text-2xl font-bold tracking-tight">
+                  Dashboard
+                </h2>
+                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                  Verwalte alles mobil und schnell.
+                </p>
+              </div>
 
-            <tr v-if="myTools.length === 0">
-              <td colspan="7" class="py-4 text-center text-neutral-500 dark:text-neutral-400">
-                Keine Einträge vorhanden
-              </td>
-            </tr>
-            </tbody>
-          </table>
+              <button
+                  @click="closeMobileNav"
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-neutral-200 text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                  aria-label="Menü schließen"
+              >
+                <BIconX class="text-xl" />
+              </button>
+            </div>
+
+            <nav class="flex flex-col gap-2">
+              <button
+                  v-for="tab in tabs"
+                  :key="tab.key"
+                  @click="selectTab(tab.key)"
+                  :class="
+                  activeTab === tab.key
+                    ? 'bg-lime-500 text-black shadow-sm'
+                    : 'text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800'
+                "
+                  class="flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium transition"
+              >
+                <component :is="tab.icon" class="text-base shrink-0" />
+                <span class="truncate">{{ tab.label }}</span>
+              </button>
+            </nav>
+          </aside>
+        </transition>
+
+        <!-- Content Card -->
+        <div class="min-w-0">
+          <transition name="fade-slide" mode="out-in">
+            <component :is="activeView" />
+          </transition>
         </div>
       </div>
-
-      <!-- Modal MyTools -->
-      <ToolCreate :new-tool="newTool" :show-modal="showModal" :usage-factor="usageFactor"
-                  :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showModal = false"
-                  @saved="loadMyTools(true)"/>
-      <ToolEdit
-          :edit-tool="editTool" :show-modal="showEdit" :usage-factor="usageFactor"
-          :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showEdit = false"
-          @saved="loadMyTools(true)"
-      />
-
-      <!-- Meine Anfragen -->
-      <div v-if="activeTab === 'requests'" class="text-neutral-600 dark:text-neutral-400">
-        <Requests/>
-      </div>
-
-      <!-- Meine Transaktionen -->
-      <div v-if="activeTab === 'transactions'" class="text-neutral-600 dark:text-neutral-400">
-        Hier siehst du deine Transaktionen. (Implementierung folgt)
-      </div>
-
-      <!-- Settings -->
-      <div v-if="activeTab === 'settings'" class="text-neutral-600 dark:text-neutral-400">
-        <Settings/>
-      </div>
-
     </div>
-    <ConfirmationPopUp
-        v-if="showDelete"
-        title="Speichern?"
-        message="Willst du den Eintrag löschen?"
-        button-save-style="warning"
-        @close="showDelete = false"
-        @confirm="deleteToolEntry"
-    />
   </div>
 </template>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.35s ease;
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.fade-slide-enter-from {
   opacity: 0;
+  transform: translateY(15px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-15px);
 }
 </style>

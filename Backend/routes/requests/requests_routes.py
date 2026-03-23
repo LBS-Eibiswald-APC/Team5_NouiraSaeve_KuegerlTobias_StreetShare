@@ -4,10 +4,12 @@ from typing import List
 
 from Backend.core.database import get_db
 from Backend.crud.requests.crud_requests import requests_crud
+from Backend.crud.tool.crud_tool import tool_crud
 from Backend.crud.user.crud_user import user_crud
 from Backend.model.request.requests import Requests
-from Backend.schemas.requests.requests_schema import RequestsCreate, RequestsUpdate, RequestsResponse
-
+from Backend.model.user.user_model import User
+from Backend.schemas.requests.requests_schema import RequestsCreateShow, RequestsUpdate, RequestsResponse, \
+    RequestsCreate, RequestCreated
 
 router = APIRouter(
     prefix="/requests",
@@ -15,9 +17,28 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=RequestsResponse)
-def create_requests(requests: RequestsCreate, db: Session = Depends(get_db)):
-    return requests_crud.create(db, requests)
+@router.post("/", response_model=RequestCreated)
+def create_requests(
+    requests: RequestsCreateShow,
+    borrower: User = Depends(user_crud.get_current_user),
+    db: Session = Depends(get_db)
+):
+    tool = tool_crud.get(db, requests.tool_id)
+
+    if not tool:
+        raise HTTPException(status_code=404, detail="Tool not found")
+
+    request_data = RequestsCreate(
+        tool_id=requests.tool_id,
+        borrower_id=borrower.id,
+        lender_id=tool.created_by,
+        to_respond_id=tool.created_by,
+        start_date=requests.start_date,
+        end_date=requests.end_date,
+        message=requests.message or ""
+    )
+
+    return requests_crud.create(db, request_data)
 
 @router.get("/me", response_model=List[RequestsResponse])
 def get_user_requests(
@@ -25,6 +46,13 @@ def get_user_requests(
     db: Session = Depends(get_db)
 ):
     return requests_crud.get_user_requests(current_user, db)
+
+@router.get("/sending/me", response_model=List[RequestsResponse])
+def get_user_requests(
+    current_user = Depends(user_crud.get_current_user),
+    db: Session = Depends(get_db)
+):
+    return requests_crud.get_sending_user_requests(current_user, db)
 
 @router.get("/", response_model=List[RequestsResponse])
 def get_tools(db: Session = Depends(get_db)):

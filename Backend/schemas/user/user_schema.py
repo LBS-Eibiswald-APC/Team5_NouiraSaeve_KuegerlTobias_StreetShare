@@ -26,8 +26,22 @@ class UserRegister(UserBase):
     hashed_pw: str
 
 
+class UserUpdatePassword(UserBase):
+    current_password: str
+    new_password: str
+
+
 class UserUpdate(UserBase):
-    password: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    display_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    street: Optional[str] = None
+    house_nr: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    zip: Optional[str] = None
 
 
 class UserResponse(UserBase):

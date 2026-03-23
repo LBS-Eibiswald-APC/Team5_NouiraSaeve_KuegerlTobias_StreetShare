@@ -8,9 +8,9 @@ class ToolCreate(BaseModel):
     description: str
     base_price: Decimal | None = None
     tool_image: bytes
+    tool_condition: str
     deposit: Decimal | None = None
-    tool_condition: str | None = None
-    created_by: int | None = None
+    created_by: int
 
 
 class ToolUpdate(BaseModel):
@@ -31,8 +31,7 @@ class ToolResponse(BaseModel):
     base_price: float | None
     deposit: float | None
     tool_condition: str | None
-    tool_image: bytes | None
-    deleted: bool
+    deleted: bool | None
     deleted_at: datetime | None = None
 
     creator_display_name: str | None

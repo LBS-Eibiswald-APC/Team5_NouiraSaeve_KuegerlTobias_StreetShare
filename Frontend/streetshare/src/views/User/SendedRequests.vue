@@ -10,7 +10,7 @@ const showMessageModal = ref(false);
 const selectedRequest = ref(null);
 
 async function loadRequests() {
-  return await requestStore.getMe();
+  return await requestStore.getSendedMe();
 }
 
 onMounted(async () => {
@@ -41,17 +41,17 @@ function onConfirm(result) {
     <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
       <div>
         <h1 class="text-3xl tracking-tight font-bold text-neutral-900 dark:text-white">
-          Anfragen
+          Gesendete Anfragen
         </h1>
         <p class="text-neutral-500 dark:text-neutral-400 mt-1">
-          Verwalte eingehende Anfragen für deine Tools
+          Überblick über deine gesendeten Anfragen
         </p>
       </div>
 
       <div
           class="px-4 py-2 rounded-2xl bg-lime-100 dark:bg-lime-500/10 text-lime-700 dark:text-lime-400 font-semibold"
       >
-        {{ requests.length }} Anfragen<span v-if="requests.length !== 1"></span>
+        {{ requests.length }} gesendet<span v-if="requests.length !== 1"/>
       </div>
     </div>
 
@@ -71,16 +71,24 @@ function onConfirm(result) {
           <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300">
             <div class="flex items-center gap-2">
               <BIconPerson/>
-              <span>Leiher</span>
+              <span>Ausleiher</span>
             </div>
           </th>
 
-          <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300 text-center">
-            <div class="flex items-center justify-center gap-2">
-              <BIconChatDots/>
+          <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300">
+            <div class="flex items-center gap-2">
+              <BIconPerson/>
               <span>Nachricht</span>
             </div>
           </th>
+
+          <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300">
+            <div class="flex items-center gap-2">
+              <BIconPerson/>
+              <span>Status</span>
+            </div>
+          </th>
+
 
           <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300 text-center">
             Aktion
@@ -105,39 +113,26 @@ function onConfirm(result) {
           </td>
 
           <td class="py-4 px-5">
-            <div class="flex justify-center">
-              <button
-                  @click="openMessageModal(request)"
-                  class="flex items-center justify-center w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-lime-100 hover:text-lime-700 dark:hover:bg-lime-500/10 dark:hover:text-lime-400 transition"
-              >
-                <BIconChatDots class="text-lg"/>
-              </button>
-            </div>
+            <button
+                @click="openMessageModal(request)"
+                class="flex items-center justify-center w-10 h-10 rounded-xl bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-lime-100 hover:text-lime-700 dark:hover:bg-lime-500/10 dark:hover:text-lime-400 transition"
+            >
+              <BIconChatDots class="text-lg"/>
+            </button>
+          </td>
+
+          <td class="py-4 px-5 text-neutral-700 dark:text-neutral-300">
+            <span
+                :class="requestStore.getStates[request.status]"
+                class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+            >
+              {{ request.status }}
+            </span>
           </td>
 
           <td class="py-4 px-5">
             <div class="flex items-center justify-center gap-3">
-              <button
-                  class="flex items-center gap-2 px-4 py-2 rounded-xl bg-lime-500 hover:bg-lime-400 text-black font-semibold transition hover:scale-105"
-              >
-                <BIconCheckCircle/>
-                <span>Akzeptieren</span>
-              </button>
 
-              <button
-                  @click="openConfirmModal(request)"
-                  class="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/90 hover:bg-red-500 text-white font-semibold transition hover:scale-105"
-              >
-                <BIconXCircle/>
-                <span>Ablehnen</span>
-              </button>
-
-              <button
-                  class="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white font-semibold transition hover:scale-105"
-              >
-                <BIconArrowLeftRight/>
-                <span>Gegenangebot</span>
-              </button>
             </div>
           </td>
         </tr>

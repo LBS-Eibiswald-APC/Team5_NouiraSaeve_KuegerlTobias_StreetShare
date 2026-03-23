@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, ForeignKey, func, BLOB
+from sqlalchemy import Column, Integer, String, DateTime, DECIMAL, ForeignKey, func
+from sqlalchemy.dialects.mysql import MEDIUMBLOB
 from sqlalchemy.orm import relationship
 from Backend.core.database import Base
 
@@ -12,7 +13,7 @@ class Tool(Base):
     base_price = Column(DECIMAL(10, 2), nullable=True)
     deposit = Column(DECIMAL(10, 2), nullable=True)
     tool_condition = Column(String(255), nullable=True)
-    tool_image = Column(BLOB, nullable=False)
+    tool_image = Column(MEDIUMBLOB, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     created_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"))
     deleted = Column(Integer, default=0)

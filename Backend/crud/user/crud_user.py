@@ -4,6 +4,7 @@ from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
+from Backend.core.database import get_db
 from Backend.core.security import oauth2_scheme
 from Backend.crud.base import CRUDBase
 from Backend.model.user.user_model import User
@@ -22,6 +23,26 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
+    def create(self, db: Session, obj_in: UserRegister) -> User:
+        existing_email = db.query(User).filter(User.email == obj_in.email).first()
+        existing_display_name = db.query(User).filter(User.display_name == obj_in.display_name).first()
+
+        errors = {}
+
+        if existing_email:
+            errors["email"] = "Diese E-Mail wird bereits verwendet."
+
+        if existing_display_name:
+            errors["display_name"] = "Dieser Anzeigename ist bereits vergeben."
+
+        if errors:
+            raise HTTPException(
+                status_code=409,
+                detail=errors
+            )
+
+        return super().create(db, obj_in)
+
     def get_by_email(self, db: Session, email: str):
         return db.query(User).filter(User.email == email).first()
 
@@ -38,39 +59,62 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
             hashed_password
         )
 
+    def update_password(self, db: Session, db_user: User, new_password: str):
+        db_user.hashed_pw = self.hash_password(new_password)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
+    def update(self, db: Session, db_obj: User, obj_in: UserUpdate) -> User:
+        update_data = obj_in.model_dump(exclude_unset=True)
+
+        errors = {}
+
+        new_email = update_data.get("email")
+        new_display_name = update_data.get("display_name")
+
+        if new_email and new_email != db_obj.email:
+            existing_email = db.query(User).filter(User.email == new_email).first()
+            if existing_email:
+                errors["email"] = "Diese E-Mail wird bereits verwendet."
+
+        if new_display_name and new_display_name != db_obj.display_name:
+            existing_display_name = db.query(User).filter(User.display_name == new_display_name).first()
+            if existing_display_name:
+                errors["display_name"] = "Dieser Anzeigename ist bereits vergeben."
+
+        if errors:
+            raise HTTPException(
+                status_code=409,
+                detail=errors
+            )
+
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
+
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
     @staticmethod
-    def get_current_user(token: str = Depends(oauth2_scheme)):
+    def get_current_user(
+            db: Session = Depends(get_db),
+            token: str = Depends(oauth2_scheme)
+    ):
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            user_id: str = payload.get("sub")
-            role: str = payload.get("role")
-            last_name: str = payload.get("last_name")
-            first_name: str = payload.get("first_name")
-            display_name: str = payload.get("display_name")
-            phone: str = payload.get("phone")
-            street: str = payload.get("street")
-            house_nr: str = payload.get("house_nr")
-            zip: str = payload.get("zip")
-            city: str = payload.get("city")
-            country: str = payload.get("country")
-            email: str = payload.get("email")
+            user_id = payload.get("sub")
 
             if user_id is None:
                 raise HTTPException(status_code=401, detail="Invalid token")
-            return {
-                "id": int(user_id),
-                "role": role,
-                "display_name": display_name,
-                "last_name": last_name,
-                "first_name": first_name,
-                "phone": phone,
-                "street": street,
-                "house_nr": house_nr,
-                "zip": zip,
-                "city": city,
-                "country": country,
-                "email": email,
-            }
+
+            user = db.query(User).filter(User.id == int(user_id)).first()
+
+            if user is None:
+                raise HTTPException(status_code=401, detail="User not found")
+
+            return user
+
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
 
