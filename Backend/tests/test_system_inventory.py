@@ -22,5 +22,5 @@ def test_inventory_filter_flow(client):
     assert detail_response.status_code == 200
     detail_data = detail_response.json()
     assert detail_data["name"] == "TestTool"
-    assert detail_data["description"] == "A tool for testing inventory filter flow."
+    assert detail_data["descrikption"] == "A tool for testing inventory filter flow."
     assert detail_data["city"] == "Teststadt"
