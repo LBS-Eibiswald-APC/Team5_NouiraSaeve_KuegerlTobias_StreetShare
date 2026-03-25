@@ -28,8 +28,22 @@ export const useRequestStore = defineStore("request", {
             return response.data;
         },
 
-        async createRequest(request) {
-            return await api.post("/requests/", request);
+        async createRequest(payload) {
+            try {
+                return await api.post("/requests/", payload);
+            } catch (error) {
+                const detail = error.response?.data?.detail;
+                throw new Error(detail);
+            }
+        },
+        async updateRequest(id, request) {
+            return await api.put(`/requests/${id}`, request);
+        },
+        async acceptRequest(id) {
+            return await api.put(`/requests/accept/${id}`);
+        },
+        async rejectRequest(id) {
+            return await api.put(`/requests/reject/${id}`);
         },
     },
 });

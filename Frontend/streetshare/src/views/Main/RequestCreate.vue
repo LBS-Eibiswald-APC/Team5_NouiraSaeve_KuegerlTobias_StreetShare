@@ -1,9 +1,10 @@
 <script setup>
 import { ref, watch } from "vue";
-import {useRequestStore} from "@/store/requestStore.js";
-import {useToast} from "vue-toast-notification";
-const $toast = useToast()
-const requestStore = useRequestStore()
+import { useRequestStore } from "@/store/requestStore.js";
+import { useToast } from "vue-toast-notification";
+
+const $toast = useToast();
+const requestStore = useRequestStore();
 
 const props = defineProps({
   showModal: {
@@ -30,22 +31,30 @@ function getLocalDateTimeValue(date = new Date()) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
+function addDays(date = new Date(), days = 1) {
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + days);
+  return newDate;
+}
+
 const request = ref({
   message: "",
   tool_id: null,
   start_date: getLocalDateTimeValue(),
-  end_date: getLocalDateTimeValue()
+  end_date: getLocalDateTimeValue(addDays(new Date(), 1))
 });
 
 watch(
     () => props.showModal,
     (isOpen) => {
       if (isOpen) {
+        const now = new Date();
+
         request.value = {
           message: "",
           tool_id: props.tool?.id ?? null,
-          start_date: getLocalDateTimeValue(),
-          end_date: getLocalDateTimeValue()
+          start_date: getLocalDateTimeValue(now),
+          end_date: getLocalDateTimeValue(addDays(now, 1))
         };
       }
     }
@@ -55,24 +64,46 @@ function close() {
   emit("closeModal");
 }
 
+function isDateRangeValid() {
+  if (!request.value.start_date || !request.value.end_date) return false;
+
+  const start = new Date(request.value.start_date);
+  const end = new Date(request.value.end_date);
+
+  return end > start;
+}
+
 async function submitRequest() {
   if (!props.tool?.id) return;
-  if (request.value.message && request.value.start_date && request.value.end_date) {
-    const payload = {
-      tool_id: props.tool.id,
-      message: request.value.message,
-      start_date: request.value.start_date,
-      end_date: request.value.end_date
-    };
 
-    const resp = await requestStore.createRequest(payload)
-    emit("submit", resp);
-    emit("closeModal");
-  } else {
-    $toast.error("Alle Pflichtfelder ausfüllen!", {"position": "top-right"})
+  if (!request.value.message || !request.value.start_date || !request.value.end_date) {
+    $toast.error("Alle Pflichtfelder ausfüllen!", { position: "top-right" });
+    return;
   }
 
+  if (!isDateRangeValid()) {
+    $toast.error("‚Ausleihen bis‘ muss nach dem Startdatum liegen.", {
+      position: "top-right"
+    });
+    return;
+  }
 
+  const payload = {
+    tool_id: props.tool.id,
+    message: request.value.message.trim(),
+    start_date: request.value.start_date,
+    end_date: request.value.end_date
+  };
+
+  try {
+    const resp = await requestStore.createRequest(payload);
+    emit("submit", resp);
+    emit("closeModal");
+  } catch (error) {
+    $toast.error(error.message || "Fehler beim Erstellen der Anfrage.", {
+      position: "top-right"
+    });
+  }
 }
 </script>
 
@@ -105,29 +136,47 @@ async function submitRequest() {
           </p>
         </div>
 
-        <div class="mt-6 grid grid-cols-2 gap-6">
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Ausleihen beginnen *
             </label>
-            <input
-                v-model="request.start_date"
-                class="w-full rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-3 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-400"
-                type="datetime-local"
-            />
+            <div class="relative">
+              <input
+                  v-model="request.start_date"
+                  class="date-input w-full rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 pr-12 py-3 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-lime-400"
+                  type="datetime-local"
+              />
+              <BIconCalendar3
+                  class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-300"
+              />
+            </div>
           </div>
 
           <div>
             <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Ausleihen bis *
             </label>
-            <input
-                v-model="request.end_date"
-                class="w-full rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-3 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-400"
-                type="datetime-local"
-            />
+            <div class="relative">
+              <input
+                  v-model="request.end_date"
+                  :min="request.start_date"
+                  class="date-input w-full rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-3 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-lime-400"
+                  type="datetime-local"
+              />
+              <BIconCalendar3
+                  class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-300"
+              />
+            </div>
           </div>
         </div>
+
+        <p
+            v-if="request.start_date && request.end_date && !isDateRangeValid()"
+            class="mt-3 text-sm text-red-500"
+        >
+          Das Enddatum muss nach dem Startdatum liegen.
+        </p>
 
         <div class="mt-6">
           <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
@@ -170,5 +219,14 @@ async function submitRequest() {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+:deep(.date-input::-webkit-calendar-picker-indicator) {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 </style>

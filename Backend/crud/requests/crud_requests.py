@@ -7,6 +7,9 @@ from Backend.schemas.requests.requests_schema import RequestsCreate, RequestsUpd
 
 
 class CRUDRequests(CRUDBase[Requests, RequestsCreate, RequestsUpdate]):
+    def check_if_requested_already(self, tool_id: int, borrower_id: int, db: Session):
+        return db.query(Requests).filter(Requests.tool_id == tool_id, Requests.borrower_id == borrower_id, Requests.status == "Ausstehend").all()
+
     def get_user_requests(self, current_user, db: Session):
         query = (
             db.query(
@@ -35,6 +38,7 @@ class CRUDRequests(CRUDBase[Requests, RequestsCreate, RequestsUpdate]):
                     end_date=req.end_date,
                     created_at=req.created_at,
                     message=req.message,
+                    status=req.status,
                 )
             )
 

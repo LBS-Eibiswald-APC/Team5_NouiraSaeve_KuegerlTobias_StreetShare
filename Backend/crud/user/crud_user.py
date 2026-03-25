@@ -1,15 +1,11 @@
-from datetime import datetime, timedelta, timezone
-
-from fastapi import HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, Depends, Request
 from jose import jwt, JWTError
+from sqlalchemy.orm import Session
 
 from Backend.core.database import get_db
-from Backend.core.security import oauth2_scheme
 from Backend.crud.base import CRUDBase
 from Backend.model.user.user_model import User
 from Backend.schemas.user.user_schema import UserRegister, UserUpdate
-from sqlalchemy.orm import Session
 
 from passlib.context import CryptContext
 
@@ -20,7 +16,7 @@ pwd_context = CryptContext(
 
 SECRET_KEY = "Pcb#o£v3,al(7]OW[5E]6)jI&j()bDy."
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
 
 class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
     def create(self, db: Session, obj_in: UserRegister) -> User:
@@ -36,10 +32,7 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
             errors["display_name"] = "Dieser Anzeigename ist bereits vergeben."
 
         if errors:
-            raise HTTPException(
-                status_code=409,
-                detail=errors
-            )
+            raise HTTPException(status_code=409, detail=errors)
 
         return super().create(db, obj_in)
 
@@ -49,15 +42,8 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
     def hash_password(self, password: str) -> str:
         return pwd_context.hash(password)
 
-    def verify_password(
-            self,
-            plain_password: str,
-            hashed_password: str
-    ) -> bool:
-        return pwd_context.verify(
-            plain_password,
-            hashed_password
-        )
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        return pwd_context.verify(plain_password, hashed_password)
 
     def update_password(self, db: Session, db_user: User, new_password: str):
         db_user.hashed_pw = self.hash_password(new_password)
@@ -84,10 +70,7 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
                 errors["display_name"] = "Dieser Anzeigename ist bereits vergeben."
 
         if errors:
-            raise HTTPException(
-                status_code=409,
-                detail=errors
-            )
+            raise HTTPException(status_code=409, detail=errors)
 
         for field, value in update_data.items():
             setattr(db_obj, field, value)
@@ -98,9 +81,16 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
 
     @staticmethod
     def get_current_user(
-            db: Session = Depends(get_db),
-            token: str = Depends(oauth2_scheme)
+        request: Request,
+        db: Session = Depends(get_db)
     ):
+        token = request.cookies.get("access_token")
+        print("COOKIES:", request.cookies)
+        print("TOKEN:", token)
+
+        if not token:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_id = payload.get("sub")

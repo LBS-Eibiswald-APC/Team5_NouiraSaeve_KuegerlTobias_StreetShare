@@ -39,12 +39,34 @@ class RequestsResponse(BaseModel):
     start_date: datetime | None
     end_date: datetime | None
     created_at: datetime | None
-    status: str | None = None
+    status: str | None
     message: str
 
     class Config:
         from_attributes = True
 
+
+class RequestsBaseResponse(BaseModel):
+    id: int
+    tool_id: int
+    to_respond_id: int | None
+    borrower_id: int | None
+    lender_id: int | None
+    start_date: datetime | None
+    end_date: datetime | None
+    created_at: datetime | None
+    status: str | None = None
+    message: str | None = None
+
+    model_config = {
+        "from_attributes": True
+    }
+
 class RequestCreated(BaseModel):
     id: int
     tool_id: int
+
+class RequestCounterOffer(BaseModel):
+    start_date: datetime
+    end_date: datetime
+    message: str | None = None

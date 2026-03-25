@@ -1,16 +1,16 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { BIconEye, BIconEyeSlash } from "bootstrap-icons-vue";
 import { useAuthStore } from "@/store/authStore";
 
 const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
+const error = ref("");
 
 const auth = useAuthStore();
 const router = useRouter();
-
-const error = ref("");
 
 const handleLogin = async () => {
   error.value = "";
@@ -24,15 +24,16 @@ const handleLogin = async () => {
     await router.push("/main");
   } else {
     error.value = auth.error;
-    console.log(auth.error);
   }
 };
 </script>
 
 <template>
   <div class="text-neutral-900 dark:text-white">
-    <div class="mx-auto flex min-h-[calc(100vh-6rem)] max-w-7xl items-center justify-center">
-      <div class="w-full max-w-md rounded-[28px] border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sm:p-10">
+    <div class="mx-auto flex min-h-[calc(100vh-6rem)] max-w-7xl items-center justify-center px-4">
+      <div
+          class="w-full max-w-md rounded-[28px] border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sm:p-10"
+      >
         <div class="mb-8">
           <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
             Willkommen zurück
@@ -41,6 +42,7 @@ const handleLogin = async () => {
             Login
           </h1>
         </div>
+
         <p
             v-if="error"
             class="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-400"
@@ -57,6 +59,7 @@ const handleLogin = async () => {
                 v-model="email"
                 type="email"
                 required
+                autocomplete="email"
                 placeholder="max@email.com"
                 class="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-400 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:placeholder:text-neutral-500"
             />
@@ -72,6 +75,7 @@ const handleLogin = async () => {
                   v-model="password"
                   :type="showPassword ? 'text' : 'password'"
                   required
+                  autocomplete="current-password"
                   placeholder="••••••••"
                   class="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 pr-12 text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-400 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:placeholder:text-neutral-500"
               />
@@ -90,9 +94,10 @@ const handleLogin = async () => {
 
           <button
               type="submit"
-              class="w-full rounded-2xl bg-neutral-950 px-4 py-3.5 font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-black"
+              :disabled="auth.loading"
+              class="w-full rounded-2xl bg-neutral-950 px-4 py-3.5 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black"
           >
-            Login
+            {{ auth.loading ? "Logge ein..." : "Login" }}
           </button>
         </form>
 

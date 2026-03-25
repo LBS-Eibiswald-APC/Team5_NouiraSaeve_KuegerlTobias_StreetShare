@@ -1,31 +1,23 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore.js";
 
-const baseUrl = "http://127.0.0.1:8000";
-
 const api = axios.create({
-    baseURL: baseUrl,
-});
-
-api.interceptors.request.use(config => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
+    baseURL: "http://localhost:8000",
+    withCredentials: true,
 });
 
 api.interceptors.response.use(
-    response => response,
-    async error => {
+    (response) => response,
+    async (error) => {
         const authStore = useAuthStore();
-        if (error.response?.status === 401) {
-            authStore.logout();
-            localStorage.removeItem("token");
+
+        const isLoginRoute = error.config?.url?.includes("/auth/login");
+
+        if (error.response?.status === 401 && !isLoginRoute) {
+            authStore.logout(false);
             window.location.href = "/login";
         }
+
         return Promise.reject(error);
     }
 );

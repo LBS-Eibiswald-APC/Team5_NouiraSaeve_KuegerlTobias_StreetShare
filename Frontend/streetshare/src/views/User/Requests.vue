@@ -9,6 +9,10 @@ const showModal = ref(false);
 const showMessageModal = ref(false);
 const selectedRequest = ref(null);
 
+const modalMode = ref(null);
+const modalMessage = ref(null);
+const modalTitle = ref(null);
+
 async function loadRequests() {
   return await requestStore.getMe();
 }
@@ -17,7 +21,20 @@ onMounted(async () => {
   requests.value = await loadRequests();
 });
 
-function openConfirmModal(request) {
+function isRequestPending(request) {
+  return request.status === "Ausstehend";
+}
+
+function openConfirmModal(request, record) {
+  modalMode.value = record;
+  if (record === "accept") {
+    modalMessage.value = "Wollen sie diese Anfrage annehmen?";
+    modalTitle.value = "Anfrage annehmen?";
+  } else if (record === "reject") {
+    modalMessage.value ="Wollen sie diese Anfrage ablehnen?";
+    modalTitle.value = "Anfrage ablehnen?";
+  }
+
   selectedRequest.value = request;
   showModal.value = true;
 }
@@ -28,6 +45,14 @@ function openMessageModal(request) {
 }
 
 function onConfirm(result) {
+  if (result) {
+    if (modalMode.value === "accept") {
+      requestStore.acceptRequest(selectedRequest.value.id);
+    } else {
+      requestStore.rejectRequest(selectedRequest.value.id);
+    }
+  }
+
   showModal.value = false;
   selectedRequest.value = null;
 }
@@ -83,6 +108,14 @@ function onConfirm(result) {
           </th>
 
           <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <BIconPerson/>
+              <span>Status</span>
+            </div>
+          </th>
+
+
+          <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300 text-center">
             Aktion
           </th>
         </tr>
@@ -114,28 +147,50 @@ function onConfirm(result) {
               </button>
             </div>
           </td>
+          <td class="py-4 px-5 text-neutral-700 dark:text-neutral-300">
+            <span
+                :class="requestStore.getStates[request.status]"
+                class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+            >
+              {{ request.status }}
+            </span>
+          </td>
 
           <td class="py-4 px-5">
             <div class="flex items-center justify-center gap-3">
               <button
-                  class="flex items-center gap-2 px-4 py-2 rounded-xl bg-lime-500 hover:bg-lime-400 text-black font-semibold transition hover:scale-105"
+                  :disabled="!isRequestPending(request)"
+                  @click="openConfirmModal(request, 'accept')"
+                  class="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition
+             bg-lime-500 text-black
+             hover:bg-lime-400 hover:scale-105
+             disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-lime-500"
               >
-                <BIconCheckCircle/>
+                <BIconCheckCircle />
                 <span>Akzeptieren</span>
               </button>
 
               <button
-                  @click="openConfirmModal(request)"
-                  class="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/90 hover:bg-red-500 text-white font-semibold transition hover:scale-105"
+                  :disabled="!isRequestPending(request)"
+                  @click="openConfirmModal(request, 'reject')"
+                  class="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition
+             bg-red-500/90 text-white
+             hover:bg-red-500 hover:scale-105
+             disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-red-500/90"
               >
-                <BIconXCircle/>
+                <BIconXCircle />
                 <span>Ablehnen</span>
               </button>
 
               <button
-                  class="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white font-semibold transition hover:scale-105"
+                  :disabled="!isRequestPending(request)"
+                  @click="openCounterOfferModal(request)"
+                  class="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition
+             bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white
+             hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:scale-105
+             disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-neutral-200 dark:disabled:hover:bg-neutral-800"
               >
-                <BIconArrowLeftRight/>
+                <BIconArrowLeftRight />
                 <span>Gegenangebot</span>
               </button>
             </div>
