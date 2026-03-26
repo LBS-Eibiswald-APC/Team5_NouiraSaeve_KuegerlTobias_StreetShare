@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from Backend.core.database import get_db
+from Backend.env_helper import env
 from Backend.crud.user.crud_user import user_crud
 from Backend.core.security import create_access_token, SECRET_KEY, ALGORITHM
 from Backend.schemas.user.user_schema import UserRegister, UserResponse
@@ -40,14 +41,16 @@ def login(
         )
 
     access_token = create_access_token(verify_user)
+    cookie_secure = (env("COOKIE_SECURE", "false") or "false").lower() == "true"
+    cookie_samesite = env("COOKIE_SAMESITE", "lax") or "lax"
 
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,      # lokal False, in Produktion True
-        samesite="lax",
-        max_age=60 * 30,   # 30 Minuten
+        secure=cookie_secure,
+        samesite=cookie_samesite,
+        max_age=60 * 30,
         expires=60 * 30,
         path="/"
     )
@@ -76,7 +79,7 @@ def verify_token(request: Request):
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return {"valid": True, "exp": payload.get("exp")}
+        return {"valid": True, "exp": payload.get("exp"), "role": payload.get("role")}
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

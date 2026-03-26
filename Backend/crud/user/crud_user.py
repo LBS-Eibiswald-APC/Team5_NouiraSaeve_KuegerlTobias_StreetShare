@@ -3,6 +3,7 @@ from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
 from Backend.core.database import get_db
+from Backend.core.security import SECRET_KEY, ALGORITHM
 from Backend.crud.base import CRUDBase
 from Backend.model.user.user_model import User
 from Backend.schemas.user.user_schema import UserRegister, UserUpdate
@@ -13,9 +14,6 @@ pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
 )
-
-SECRET_KEY = "Pcb#o£v3,al(7]OW[5E]6)jI&j()bDy."
-ALGORITHM = "HS256"
 
 
 class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
@@ -85,8 +83,6 @@ class CRUDUser(CRUDBase[User, UserRegister, UserUpdate]):
         db: Session = Depends(get_db)
     ):
         token = request.cookies.get("access_token")
-        print("COOKIES:", request.cookies)
-        print("TOKEN:", token)
 
         if not token:
             raise HTTPException(status_code=401, detail="Not authenticated")

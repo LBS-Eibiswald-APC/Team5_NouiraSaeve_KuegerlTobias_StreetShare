@@ -5,6 +5,7 @@ from decimal import Decimal
 
 class TransactionCreate(BaseModel):
     tool_id: int
+    request_id: int | None = None
     borrower_id: int
     lender_id: int
     start_date: datetime
@@ -15,6 +16,7 @@ class TransactionCreate(BaseModel):
 
 class TransactionUpdate(BaseModel):
     tool_id: int | None = None
+    request_id: int | None = None
     borrower_id: int | None = None
     lender_id: int | None = None
     start_date: datetime | None = None
@@ -26,8 +28,12 @@ class TransactionUpdate(BaseModel):
 class TransactionResponse(BaseModel):
     id: int
     tool_id: int
+    request_id: int | None = None
+    tool_name: str | None = None
     borrower_id: int
+    borrower_name: str | None = None
     lender_id: int
+    lender_name: str | None = None
     start_date: datetime | None
     end_date: datetime | None
     created_at: datetime | None

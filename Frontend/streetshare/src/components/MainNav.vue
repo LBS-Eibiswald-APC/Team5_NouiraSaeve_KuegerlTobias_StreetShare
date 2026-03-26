@@ -15,30 +15,30 @@ onMounted(async () => {
     try {
       await auth.getMe();
     } catch {
-      //
+      router.push("/login");
     }
   }
 });
 
-const goLogin = () => {
+const goLogin = async () => {
   mobileMenuOpen.value = false;
-  router.push("/login");
+  await router.push("/login");
 };
 
-const goUserPage = () => {
+const goUserPage = async () => {
   mobileMenuOpen.value = false;
-  router.push("/dashboard");
+  await router.push("/dashboard");
 };
 
-const goMain = () => {
+const goMain = async () => {
   mobileMenuOpen.value = false;
-  router.push("/main");
+  await router.push("/main");
 };
 
-const logout = () => {
-  auth.logout();
+const logout = async () => {
+  await auth.logout();
   mobileMenuOpen.value = false;
-  router.push("/login");
+  await router.push("/login");
 };
 
 const toggleMobileMenu = () => {

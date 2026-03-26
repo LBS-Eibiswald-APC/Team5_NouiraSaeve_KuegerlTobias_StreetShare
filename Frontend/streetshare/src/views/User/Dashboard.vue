@@ -4,6 +4,7 @@ import Settings from "@/views/User/Settings.vue";
 import Requests from "@/views/User/Requests.vue";
 import Entries from "@/views/User/Entries.vue";
 import SendedRequests from "@/views/User/SendedRequests.vue";
+import Transactions from "@/views/User/Transactions.vue";
 
 import {
   BIconGrid,
@@ -41,7 +42,7 @@ const tabs = [
     key: "transactions",
     label: "Meine Transaktionen",
     icon: BIconArrowLeftRight,
-    view: "",
+    view: Transactions,
   },
   {
     key: "settings",

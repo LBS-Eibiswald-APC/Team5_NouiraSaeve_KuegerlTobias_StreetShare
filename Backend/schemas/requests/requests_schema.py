@@ -32,6 +32,7 @@ class RequestsResponse(BaseModel):
     id: int
     tool_id: int
     tool_name: str
+    tool_deposit: float | None = None
     to_respond_id: int | None
     borrower_id: int | None
     borrower_username: str
@@ -41,9 +42,16 @@ class RequestsResponse(BaseModel):
     created_at: datetime | None
     status: str | None
     message: str
+    has_transaction: bool = False
+    transaction_id: int | None = None
 
     class Config:
         from_attributes = True
+
+
+class RequestsListResponse(BaseModel):
+    requests: list[RequestsResponse]
+    total: int
 
 
 class RequestsBaseResponse(BaseModel):

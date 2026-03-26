@@ -6,6 +6,7 @@ export const useAuthStore = defineStore("auth", {
         user: null,
         user_id: null,
         isAuthenticated: false,
+        initialized: false,
         loading: false,
         error: null,
     }),
@@ -17,11 +18,13 @@ export const useAuthStore = defineStore("auth", {
                 this.user = response.data;
                 this.user_id = response.data.id;
                 this.isAuthenticated = true;
+                this.initialized = true;
                 return response.data;
             } catch (error) {
                 this.user = null;
                 this.user_id = null;
                 this.isAuthenticated = false;
+                this.initialized = true;
                 throw error;
             }
         },
@@ -111,7 +114,17 @@ export const useAuthStore = defineStore("auth", {
                 await this.getMe();
             } catch {
                 this.logout(false);
+            } finally {
+                this.initialized = true;
             }
+        },
+
+        async ensureInitialized() {
+            if (this.initialized) {
+                return;
+            }
+
+            await this.fetchUser();
         },
 
         async logout(callBackend = true) {
@@ -125,6 +138,7 @@ export const useAuthStore = defineStore("auth", {
                 this.user = null;
                 this.user_id = null;
                 this.isAuthenticated = false;
+                this.initialized = true;
                 this.error = null;
             }
         },

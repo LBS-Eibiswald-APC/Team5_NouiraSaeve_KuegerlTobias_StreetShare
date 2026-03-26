@@ -12,8 +12,9 @@ api.interceptors.response.use(
         const authStore = useAuthStore();
 
         const isLoginRoute = error.config?.url?.includes("/auth/login");
+        const isMeRoute = error.config?.url?.includes("/users/me");
 
-        if (error.response?.status === 401 && !isLoginRoute) {
+        if (error.response?.status === 401 && !isLoginRoute && !isMeRoute) {
             authStore.logout(false);
             window.location.href = "/login";
         }

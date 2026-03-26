@@ -1,28 +1,79 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import ConfirmationPopUp from "@/components/PopUp/ConfirmationPopUp.vue";
 import {useRequestStore} from "@/store/requestStore.js";
 
 const requestStore = useRequestStore();
 const requests = ref([]);
+const total = ref(0);
+const loading = ref(false);
 const showModal = ref(false);
 const showMessageModal = ref(false);
 const selectedRequest = ref(null);
+const filters = ref({
+  search: "",
+  status: "",
+});
+const page = ref(1);
+const perPage = ref(10);
 
 const modalMode = ref(null);
 const modalMessage = ref(null);
 const modalTitle = ref(null);
 
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)));
+const hasActiveFilters = computed(() => Boolean(filters.value.search.trim() || filters.value.status));
+
 async function loadRequests() {
-  return await requestStore.getMe();
+  loading.value = true;
+
+  try {
+    const response = await requestStore.getMe({
+      search: filters.value.search?.trim() || undefined,
+      status: filters.value.status || undefined,
+      skip: (page.value - 1) * perPage.value,
+      limit: perPage.value,
+    });
+
+    requests.value = response.requests;
+    total.value = response.total;
+  } finally {
+    loading.value = false;
+  }
 }
 
 onMounted(async () => {
-  requests.value = await loadRequests();
+  await loadRequests();
 });
 
 function isRequestPending(request) {
   return request.status === "Ausstehend";
+}
+
+async function applyFilters() {
+  page.value = 1;
+  await loadRequests();
+}
+
+async function resetFilters() {
+  filters.value.search = "";
+  filters.value.status = "";
+  page.value = 1;
+  await loadRequests();
+}
+
+async function changePage(nextPage) {
+  if (nextPage < 1 || nextPage > totalPages.value) {
+    return;
+  }
+
+  page.value = nextPage;
+  await loadRequests();
+}
+
+async function changePerPage() {
+  page.value = 1;
+  await loadRequests();
 }
 
 function openConfirmModal(request, record) {
@@ -31,7 +82,7 @@ function openConfirmModal(request, record) {
     modalMessage.value = "Wollen sie diese Anfrage annehmen?";
     modalTitle.value = "Anfrage annehmen?";
   } else if (record === "reject") {
-    modalMessage.value ="Wollen sie diese Anfrage ablehnen?";
+    modalMessage.value = "Wollen sie diese Anfrage ablehnen?";
     modalTitle.value = "Anfrage ablehnen?";
   }
 
@@ -44,25 +95,40 @@ function openMessageModal(request) {
   showMessageModal.value = true;
 }
 
-function onConfirm(result) {
+async function onConfirm(result) {
   if (result) {
     if (modalMode.value === "accept") {
-      requestStore.acceptRequest(selectedRequest.value.id);
+      await requestStore.acceptRequest(selectedRequest.value.id);
     } else {
-      requestStore.rejectRequest(selectedRequest.value.id);
+      await requestStore.rejectRequest(selectedRequest.value.id);
     }
+
+    await loadRequests();
   }
 
   showModal.value = false;
   selectedRequest.value = null;
 }
+
+function onSearchChange(event) {
+  if (event.target.value.trim().length === 0) {
+    applyFilters();
+  }
+}
+
+watch(
+  () => filters.value.status,
+  async () => {
+    await changePerPage()
+  }
+);
+
 </script>
 
 <template>
   <div
       class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl shadow-xl p-6"
   >
-
     <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
       <div>
         <h1 class="text-3xl tracking-tight font-bold text-neutral-900 dark:text-white">
@@ -76,7 +142,32 @@ function onConfirm(result) {
       <div
           class="px-4 py-2 rounded-2xl bg-lime-100 dark:bg-lime-500/10 text-lime-700 dark:text-lime-400 font-semibold"
       >
-        {{ requests.length }} Anfragen<span v-if="requests.length !== 1"></span>
+        {{ total }} Anfragen
+      </div>
+    </div>
+
+    <div class="mb-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/40 p-4">
+      <div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_auto_auto]">
+        <input
+            v-model="filters.search"
+            @keydown.enter="applyFilters"
+            @input="onSearchChange"
+            type="search"
+            placeholder="Nach Tool, Nutzer oder Nachricht suchen"
+            class="w-full rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-3 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-lime-400"
+        />
+
+        <select
+            v-model="filters.status"
+            class="w-full rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-4 py-3 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-lime-400"
+        >
+          <option value="">Alle Statuse</option>
+          <option value="Ausstehend">Ausstehend</option>
+          <option value="Akzeptiert">Akzeptiert</option>
+          <option value="Bezahlt">Bezahlt</option>
+          <option value="Abgelehnt">Abgelehnt</option>
+          <option value="Gegenangebot">Gegenangebot</option>
+        </select>
       </div>
     </div>
 
@@ -114,7 +205,6 @@ function onConfirm(result) {
             </div>
           </th>
 
-
           <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300 text-center">
             Aktion
           </th>
@@ -122,8 +212,15 @@ function onConfirm(result) {
         </thead>
 
         <tbody>
+        <tr v-if="loading">
+          <td colspan="5" class="py-14 text-center text-neutral-500 dark:text-neutral-400">
+            Anfragen werden geladen...
+          </td>
+        </tr>
+
         <tr
             v-for="request in requests"
+            v-else
             :key="request.id"
             class="border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800/60 transition"
         >
@@ -184,7 +281,6 @@ function onConfirm(result) {
 
               <button
                   :disabled="!isRequestPending(request)"
-                  @click="openCounterOfferModal(request)"
                   class="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition
              bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white
              hover:bg-neutral-300 dark:hover:bg-neutral-700 hover:scale-105
@@ -197,16 +293,18 @@ function onConfirm(result) {
           </td>
         </tr>
 
-        <tr v-if="requests.length === 0">
-          <td colspan="4" class="py-14 text-center">
+        <tr v-if="!loading && requests.length === 0">
+          <td colspan="5" class="py-14 text-center">
             <div class="flex flex-col items-center justify-center gap-3 text-neutral-500 dark:text-neutral-400">
               <div
                   class="w-16 h-16 rounded-2xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center"
               >
                 <BIconChatDots class="text-2xl"/>
               </div>
-              <p class="text-lg font-medium">Keine Anfragen vorhanden</p>
-              <p class="text-sm">Sobald jemand ein Tool anfragt, siehst du es hier.</p>
+              <p class="text-lg font-medium">Keine Anfragen gefunden</p>
+              <p class="text-sm">
+                {{ hasActiveFilters ? "Passe die Filter an, um mehr Ergebnisse zu sehen." : "Sobald jemand ein Tool anfragt, siehst du es hier." }}
+              </p>
             </div>
           </td>
         </tr>
@@ -214,18 +312,53 @@ function onConfirm(result) {
       </table>
     </div>
 
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+        <span>Pro Seite:</span>
+        <select
+            v-model="perPage"
+            @change="changePerPage"
+            class="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-white"
+        >
+          <option :value="5">5</option>
+          <option :value="10">10</option>
+          <option :value="25">25</option>
+        </select>
+      </div>
+
+      <div class="flex items-center justify-center gap-3">
+        <button
+            @click="changePage(page - 1)"
+            :disabled="page <= 1 || loading"
+            class="px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition disabled:opacity-50"
+        >
+          Zurück
+        </button>
+
+        <span class="text-sm text-neutral-500 dark:text-neutral-400">
+          Seite {{ page }} von {{ totalPages }}
+        </span>
+
+        <button
+            @click="changePage(page + 1)"
+            :disabled="page >= totalPages || loading"
+            class="px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition disabled:opacity-50"
+        >
+          Weiter
+        </button>
+      </div>
+    </div>
+
     <transition name="fade">
       <div
           v-if="showMessageModal"
           class="fixed inset-0 z-[60] flex items-center justify-center px-4"
       >
-        <!-- Overlay -->
         <div
             class="absolute inset-0 bg-black/50 backdrop-blur-sm"
             @click="showMessageModal = false"
         ></div>
 
-        <!-- Modal -->
         <div
             class="relative z-10 w-full max-w-lg rounded-[28px] border border-neutral-200 bg-white p-6 shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
         >
@@ -259,8 +392,8 @@ function onConfirm(result) {
 
     <ConfirmationPopUp
         v-if="showModal"
-        title="Anfrage ablehnen?"
-        message="Willst du diese Anfrage wirklich ablehnen?"
+        :title="modalTitle"
+        :message="modalMessage"
         @close="showModal = false"
         @confirm="onConfirm"
     />
