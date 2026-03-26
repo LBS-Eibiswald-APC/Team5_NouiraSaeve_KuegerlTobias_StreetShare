@@ -1,7 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import inspect, text
 from Backend.core.database import Base, engine
 from Backend.routes.user.user_routes import router as user_router
 from Backend.routes.role.role_routes import router as role_router
@@ -9,20 +8,13 @@ from Backend.routes.tool.tool_routes import router as tool_routes
 from Backend.routes.user.auth import router as auth_router
 from Backend.routes.requests.requests_routes import router as request_routes
 from Backend.routes.transactions.transaction_routes import router as transaction_routes
+from Backend.util.bootstrap import ensure_schema_updates, seed_roles_and_admin
 
 Base.metadata.create_all(bind=engine)
 
 
-def ensure_schema_updates():
-    inspector = inspect(engine)
-    transaction_columns = [column["name"] for column in inspector.get_columns("transactions")]
-
-    if "request_id" not in transaction_columns:
-        with engine.begin() as connection:
-            connection.execute(text("ALTER TABLE transactions ADD COLUMN request_id INTEGER NULL"))
-
-
 ensure_schema_updates()
+seed_roles_and_admin()
 
 app = FastAPI(
     title="StreetShare API",

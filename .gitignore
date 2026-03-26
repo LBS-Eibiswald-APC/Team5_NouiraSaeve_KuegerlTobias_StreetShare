@@ -11,6 +11,8 @@ Frontend/streetshare/node_modules
 dist
 dist-ssr
 *.local
+.vite/
+Frontend/streetshare/.vite/
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +24,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# env
+.env
+Backend/.env
+
+
+#frontend
+node_modules/
+Frontend/node_modules/
+Frontend/streetshare/node_modules/
+dist/
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
