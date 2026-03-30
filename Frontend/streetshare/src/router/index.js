@@ -12,13 +12,13 @@ const routes = [
         path: "/login",
         name: "login",
         component: LoginView,
-        meta: { requiresAuth: false, showNav: true }
+        meta: { requiresAuth: false, showNav: null }
     },
     {
         path: "/register",
         name: "register",
         component: RegisterView,
-        meta: { requiresAuth: false, showNav: true  }
+        meta: { requiresAuth: false, showNav: null  }
     },
     {
         path: "/main",

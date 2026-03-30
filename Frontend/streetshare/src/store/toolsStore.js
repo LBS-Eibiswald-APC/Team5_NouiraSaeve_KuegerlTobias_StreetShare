@@ -105,7 +105,6 @@ export const useToolsStore = defineStore("tools", {
                 formData.append("description", tool.description ?? "");
                 formData.append("base_price", String(tool.base_price));
                 formData.append("tool_condition", tool.tool_condition);
-                formData.append("deposit", String(tool.deposit));
 
                 if (tool.tool_image) {
                     formData.append("tool_image", tool.tool_image);
@@ -125,7 +124,6 @@ export const useToolsStore = defineStore("tools", {
                 formData.append("description", tool.description ?? "");
                 formData.append("base_price", String(tool.base_price));
                 formData.append("tool_condition", tool.tool_condition);
-                formData.append("deposit", String(tool.deposit));
 
                 if (tool.tool_image) {
                     formData.append("tool_image", tool.tool_image);
@@ -145,6 +143,24 @@ export const useToolsStore = defineStore("tools", {
                 return await api.delete(`/tools/${tool_id}`);
             } catch (e) {
                 console.log(e);
+            }
+        },
+        async calculateDeposit(basePrice, toolCondition) {
+            if (!basePrice || basePrice <= 0 || !toolCondition) {
+                return 0;
+            }
+
+            try {
+                const response = await api.get("/tools/calculate-deposit", {
+                    params: {
+                        base_price: basePrice,
+                        tool_condition: toolCondition,
+                    },
+                });
+                return response.data.deposit ?? 0;
+            } catch (error) {
+                console.error("Fehler beim Berechnen des Pfands:", error);
+                return 0;
             }
         },
     },

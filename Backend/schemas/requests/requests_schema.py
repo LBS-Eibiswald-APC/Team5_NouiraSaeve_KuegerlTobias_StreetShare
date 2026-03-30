@@ -73,6 +73,7 @@ class RequestsBaseResponse(BaseModel):
 class RequestCreated(BaseModel):
     id: int
     tool_id: int
+    conversation_id: int
 
 class RequestCounterOffer(BaseModel):
     start_date: datetime

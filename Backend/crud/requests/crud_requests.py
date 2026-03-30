@@ -1,4 +1,4 @@
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session
 
 from Backend.crud.base import CRUDBase
@@ -16,6 +16,38 @@ class CRUDRequests(CRUDBase[Requests, RequestsCreate, RequestsUpdate]):
             Requests.borrower_id == borrower_id,
             Requests.status == "Ausstehend"
         ).all()
+
+    def check_if_rejected_before(self, tool_id: int, borrower_id: int, db: Session):
+        return db.query(Requests).filter(
+            Requests.tool_id == tool_id,
+            Requests.borrower_id == borrower_id,
+            Requests.status == "Abgelehnt"
+        ).first()
+
+    def get_latest_for_conversation(self, db: Session, conversation):
+        if conversation is None:
+            return None
+
+        user_ids = [conversation.user1_id, conversation.user2_id]
+
+        return (
+            db.query(Requests)
+            .filter(
+                or_(
+                    Requests.tool_id == conversation.tool_id,
+                    and_(
+                        Requests.borrower_id.in_(user_ids),
+                        Requests.lender_id.in_(user_ids),
+                    ),
+                ),
+            )
+            .order_by(Requests.created_at.desc(), Requests.id.desc())
+            .first()
+        )
+
+    def is_conversation_rejected(self, db: Session, conversation) -> bool:
+        latest_request = self.get_latest_for_conversation(db, conversation)
+        return latest_request is not None and latest_request.status == "Abgelehnt"
 
     def _apply_request_filters(self, query, search: str | None = None, status: str | None = None):
         if search and search.strip():

@@ -5,6 +5,10 @@ import Requests from "@/views/User/Requests.vue";
 import Entries from "@/views/User/Entries.vue";
 import SendedRequests from "@/views/User/SendedRequests.vue";
 import Transactions from "@/views/User/Transactions.vue";
+import Chat from "@/views/User/Chat.vue";
+import Support from "@/views/User/Support.vue";
+import { useDashboardStore } from "@/store/dashboardStore";
+import { useAuthStore } from "@/store/authStore";
 
 import {
   BIconGrid,
@@ -12,19 +16,33 @@ import {
   BIconArrowLeftRight,
   BIconGear,
   BIconList,
-  BIconX
+  BIconX,
+  BIconChat,
+  BIconShieldLock
 } from "bootstrap-icons-vue";
 
+const dashboardStore = useDashboardStore();
+const authStore = useAuthStore();
 const activeTab = ref("entries");
 const mobileNavOpen = ref(false);
 const isMobile = ref(false);
 
-const tabs = [
+const isAdmin = computed(() => {
+  return authStore.user?.role?.name === "Admin" || Number(authStore.user?.role_id) === 1;
+});
+
+const baseTabs = [
   {
     key: "entries",
     label: "Meine Einträge",
     icon: BIconGrid,
     view: Entries,
+  },
+  {
+    key: "chat",
+    label: "Meine Chats",
+    icon: BIconChat,
+    view: Chat,
   },
   {
     key: "requests",
@@ -52,8 +70,24 @@ const tabs = [
   },
 ];
 
+const tabs = computed(() => {
+  if (!isAdmin.value) {
+    return baseTabs;
+  }
+
+  return [
+    ...baseTabs,
+    {
+      key: "support",
+      label: "Support",
+      icon: BIconShieldLock,
+      view: Support,
+    },
+  ];
+});
+
 const activeTabObject = computed(() => {
-  return tabs.find((tab) => tab.key === activeTab.value) ?? tabs[0];
+  return tabs.value.find((tab) => tab.key === activeTab.value) ?? tabs.value[0];
 });
 
 const activeTitle = computed(() => {
@@ -73,7 +107,7 @@ function handleResize() {
 
 function selectTab(tabKey) {
   activeTab.value = tabKey;
-  localStorage.setItem("activeTab", activeTab.value);
+  dashboardStore.setActiveTab(activeTab.value);
 
   if (isMobile.value) {
     mobileNavOpen.value = false;
@@ -95,14 +129,16 @@ function handleEscape(e) {
 }
 
 onBeforeMount(() => {
-  const activeTabStorage = localStorage.getItem("activeTab");
-  const tabExists = tabs.some((tab) => tab.key === activeTabStorage);
+  const activeTabStorage = dashboardStore.activeTab || localStorage.getItem("dashboardActiveTab");
+  const tabFromStorageExists = tabs.value.some((tab) => tab.key === activeTabStorage);
 
-  if (activeTabStorage && tabExists) {
+  if (activeTabStorage && tabFromStorageExists) {
     activeTab.value = activeTabStorage;
   } else {
-    localStorage.setItem("activeTab", activeTab.value);
+    activeTab.value = tabs.value[0].key;
   }
+
+  dashboardStore.setActiveTab(activeTab.value);
 })
 
 onMounted(() => {
@@ -117,6 +153,8 @@ onBeforeUnmount(() => {
 });
 
 watch(activeTab, () => {
+  dashboardStore.setActiveTab(activeTab.value);
+  window.scrollTo(0,0)
   if (isMobile.value) {
     closeMobileNav();
   }
@@ -125,10 +163,10 @@ watch(activeTab, () => {
 
 <template>
   <div class="min-h-screen text-neutral-900 dark:text-white font-sans">
-    <div class="mx-auto flex max-w-[1600px] gap-6 px-4 py-4 sm:px-6  lg:py-10">
+    <div class="mx-auto flex min-h-[calc(100vh-2rem)] gap-6 px-4 py-4 sm:px-6 lg:min-h-[calc(100vh-5rem)] lg:py-10">
       <!-- Desktop Sidebar -->
       <aside
-          class="hidden h-screen lg:block lg:w-72 shrink-0 rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sticky top-8"
+          class="hidden lg:block lg:w-72 shrink-0 rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sticky top-8 self-start h-[calc(100vh-4rem)]"
       >
         <div class="mb-4 px-2">
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-lime-500">
@@ -161,7 +199,7 @@ watch(activeTab, () => {
       </aside>
 
       <!-- Main Content -->
-      <div class="flex-1 min-w-0 flex flex-col gap-4 lg:gap-6">
+      <div class="flex-1 min-w-0 flex min-h-0 flex-col gap-4 lg:gap-6">
         <!-- Mobile Topbar -->
         <div
             class="lg:hidden sticky top-0 z-30 rounded-2xl border border-neutral-200 bg-white/90 backdrop-blur px-4 py-3 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/90"
@@ -257,7 +295,7 @@ watch(activeTab, () => {
         </transition>
 
         <!-- Content Card -->
-        <div class="min-w-0">
+        <div class="min-w-0 flex-1 min-h-0">
           <transition name="fade-slide" mode="out-in">
             <component :is="activeView" />
           </transition>

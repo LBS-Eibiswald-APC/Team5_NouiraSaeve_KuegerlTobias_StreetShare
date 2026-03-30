@@ -7,6 +7,8 @@ from starlette.status import HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN, HTTP_400_BA
 from Backend.core.dependencies import is_admin, require_role
 from Backend.core.database import get_db
 from Backend.crud.requests.crud_requests import requests_crud
+from Backend.crud.chats.conversation import crud_conversation
+from Backend.crud.chats.messages import crud_messages
 from Backend.crud.tool.crud_tool import tool_crud
 from Backend.crud.user.crud_user import user_crud
 from Backend.model.user.user_model import User
@@ -43,17 +45,46 @@ def create_requests(
     if requested_already:
         raise HTTPException(status_code=400, detail="Sie haben dieses Tool schon angefragt.")
 
+    rejected_before = requests_crud.check_if_rejected_before(requests.tool_id, borrower.id, db)
+    if rejected_before:
+        raise HTTPException(
+            status_code=400,
+            detail="Diese Anfrage wurde bereits abgelehnt und kann nicht erneut gesendet werden.",
+        )
+
+    conversation = crud_conversation.get_or_create_for_users(
+        db,
+        user_a_id=borrower.id,
+        user_b_id=tool.created_by,
+        tool_id=tool.id,
+    )
+
     request_data = RequestsCreate(
         tool_id=requests.tool_id,
         borrower_id=borrower.id,
         lender_id=tool.created_by,
         to_respond_id=tool.created_by,
+        conversation_id=conversation.id,
         start_date=requests.start_date,
         end_date=requests.end_date,
         message=requests.message or ""
     )
 
-    return requests_crud.create(db, request_data)
+    created_request = requests_crud.create(db, request_data)
+
+    if requests.message and requests.message.strip():
+        crud_messages.create_message(
+            db=db,
+            conversation_id=conversation.id,
+            sender_id=borrower.id,
+            content=requests.message.strip(),
+        )
+
+    return RequestCreated(
+        id=created_request.id,
+        tool_id=created_request.tool_id,
+        conversation_id=conversation.id,
+    )
 
 
 @router.get("/me", response_model=RequestsListResponse)

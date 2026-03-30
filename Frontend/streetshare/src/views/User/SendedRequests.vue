@@ -25,6 +25,17 @@ const perPage = ref(10);
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / perPage.value)));
 const hasActiveFilters = computed(() => Boolean(filters.value.search.trim() || filters.value.status));
 
+function formatDate(value) {
+  if (!value) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
 async function loadRequests() {
   loading.value = true;
 
@@ -183,7 +194,6 @@ async function confirmPayment() {
           <option value="Akzeptiert">Akzeptiert</option>
           <option value="Bezahlt">Bezahlt</option>
           <option value="Abgelehnt">Abgelehnt</option>
-          <option value="Gegenangebot">Gegenangebot</option>
         </select>
       </div>
     </div>
@@ -215,6 +225,10 @@ async function confirmPayment() {
           </th>
 
           <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300">
+            Zeitraum
+          </th>
+
+          <th class="py-4 px-5 font-semibold text-neutral-700 dark:text-neutral-300">
             <div class="flex items-center gap-2">
               <BIconPerson/>
               <span>Status</span>
@@ -229,7 +243,7 @@ async function confirmPayment() {
 
         <tbody>
         <tr v-if="loading">
-          <td colspan="5" class="py-14 text-center text-neutral-500 dark:text-neutral-400">
+          <td colspan="6" class="py-14 text-center text-neutral-500 dark:text-neutral-400">
             Gesendete Anfragen werden geladen...
           </td>
         </tr>
@@ -259,6 +273,11 @@ async function confirmPayment() {
             </button>
           </td>
 
+          <td class="py-4 px-5 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
+            <div>Von: {{ formatDate(request.start_date) }}</div>
+            <div>Bis: {{ formatDate(request.end_date) }}</div>
+          </td>
+
           <td class="py-4 px-5 text-neutral-700 dark:text-neutral-300">
             <span
                 :class="requestStore.getStates[request.status]"
@@ -282,7 +301,7 @@ async function confirmPayment() {
         </tr>
 
         <tr v-if="!loading && requests.length === 0">
-          <td colspan="5" class="py-14 text-center">
+          <td colspan="6" class="py-14 text-center">
             <div class="flex flex-col items-center justify-center gap-3 text-neutral-500 dark:text-neutral-400">
               <div
                   class="w-16 h-16 rounded-2xl bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center"

@@ -1,14 +1,14 @@
 <script setup>
 import {onMounted, ref, nextTick} from "vue";
 import {useToolsStore} from "@/store/toolsStore";
-import RequestCreate from "@/views/Main/RequestCreate.vue";
-import {useToast} from "vue-toast-notification";
+import {useRouter} from "vue-router";
+import { useDashboardStore } from "@/store/dashboardStore";
 
 const toolStore = useToolsStore();
 const selectedTool = ref(null);
 const showModal = ref(false);
-const showRequestCreate = ref(false);
-const $toast = useToast()
+const router = useRouter();
+const dashboardStore = useDashboardStore();
 
 const euroFormat = new Intl.NumberFormat("de-DE", {
   style: "currency",
@@ -54,22 +54,6 @@ async function applyFilters() {
   scrollToGrid();
 }
 
-async function checkResponse(resp) {
-  try {
-    if (resp.status === 200 || resp.status === 201) {
-      $toast.success("Es wurde erfolgreich die Anfrage gesendet", {
-        position: "top-right",
-      });
-      showModal.value = false;
-    }
-  } catch (error) {
-    $toast.error("Fehler beim Einreichen der Anfrage", {
-      position: "top-right",
-    });
-    console.error(error);
-  }
-}
-
 async function resetFilters() {
   toolStore.filters.name = "";
   toolStore.filters.city = "";
@@ -85,12 +69,30 @@ function onSearchChange(event) {
     applyFilters();
   }
 }
+
+async function startRequestInChat(tool) {
+  if (!tool?.id) {
+    return;
+  }
+
+  sessionStorage.setItem("pendingChatRequest", JSON.stringify({
+    toolId: tool.id,
+    toolName: tool.name,
+    creatorName: tool.creator_display_name,
+    deposit: tool.deposit,
+  }));
+
+  dashboardStore.startChatRequest(tool.id);
+
+  showModal.value = false;
+
+  await router.push({ name: "dashboard" });
+}
 </script>
 
 <template>
   <div class="min-h-screen px-4 py-5 sm:px-6 lg:px-8 text-neutral-900 dark:text-white">
     <div class="mx-auto max-w-7xl">
-      <!-- Header -->
       <div class="mb-4">
         <div
             class="rounded-3xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm p-4 sm:p-5"
@@ -115,10 +117,7 @@ function onSearchChange(event) {
         </div>
       </div>
 
-      <!-- Content -->
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <!-- Filter Sidebar -->
-        <!-- Filter Sidebar -->
         <aside class="lg:self-start">
           <div
               class="h-fit rounded-3xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm p-4 lg:sticky lg:top-5"
@@ -183,9 +182,7 @@ function onSearchChange(event) {
           </div>
         </aside>
 
-        <!-- Main -->
         <section id="tools-grid" class="space-y-4">
-          <!-- Top bar -->
           <div
               class="rounded-3xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm px-5 py-3"
           >
@@ -210,7 +207,6 @@ function onSearchChange(event) {
             </div>
           </div>
 
-          <!-- Grid -->
           <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
             <div
                 v-if="toolStore.loading"
@@ -244,9 +240,12 @@ function onSearchChange(event) {
                 </div>
 
                 <div
-                    class="rounded-full bg-neutral-100 dark:bg-neutral-800 px-3 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap"
+                    :class="tool.availability_status === 'Ausgeliehen'
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'
+                      : 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'"
+                    class="rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap"
                 >
-                  Verfügbar
+                  {{ tool.availability_status || "Verfügbar" }}
                 </div>
               </div>
 
@@ -267,7 +266,7 @@ function onSearchChange(event) {
               </div>
 
               <button
-                  @click.stop="openToolModal(tool); showRequestCreate = true"
+                  @click.stop="startRequestInChat(tool)"
                   class="mt-5 w-full rounded-2xl bg-lime-500 px-4 py-3 font-semibold text-black hover:bg-lime-400 transition"
               >
                 Anfragen
@@ -275,7 +274,6 @@ function onSearchChange(event) {
             </article>
           </div>
 
-          <!-- Pagination -->
           <div
               class="rounded-3xl border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800 shadow-sm px-5 py-4"
           >
@@ -305,7 +303,6 @@ function onSearchChange(event) {
       </div>
     </div>
 
-    <!-- Modal -->
     <transition name="fade">
       <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center px-4">
         <div
@@ -365,7 +362,7 @@ function onSearchChange(event) {
           </div>
 
           <button
-              @click="showRequestCreate = true"
+              @click="startRequestInChat(selectedTool)"
               class="mt-8 w-full rounded-2xl bg-lime-500 px-6 py-3.5 font-semibold text-black hover:bg-lime-400 transition"
           >
             Anfragen
@@ -373,12 +370,6 @@ function onSearchChange(event) {
         </div>
       </div>
     </transition>
-    <RequestCreate
-        :show-modal="showRequestCreate"
-        :tool="selectedTool"
-        @closeModal="showRequestCreate = false"
-        @submit="checkResponse"
-    />
   </div>
 </template>
 

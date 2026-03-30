@@ -55,3 +55,8 @@ class UserResponse(UserBase):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+
+class UserChat(BaseModel):
+    id: int
+    display_name: str

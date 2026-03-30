@@ -31,20 +31,20 @@ async def create_tool(
     description: str = Form(...),
     base_price: float = Form(...),
     tool_condition: str = Form(...),
-    deposit: float = Form(...),
     current_user=Depends(user_crud.get_current_user),
     tool_image: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
     raw_image_bytes = await tool_image.read()
     compressed_image_bytes = tool_crud.compress_image_bytes(raw_image_bytes)
+    calculated_deposit = tool_crud.calculate_deposit(base_price, tool_condition)
 
     tool_data = ToolCreate(
         name=name,
         description=description,
         base_price=base_price,
         tool_condition=tool_condition,
-        deposit=deposit,
+        deposit=calculated_deposit,
         created_by=current_user.id,
         tool_image=compressed_image_bytes,
     )
@@ -73,7 +73,6 @@ async def update_tool(
     description: str = Form(...),
     base_price: float = Form(...),
     tool_condition: str = Form(...),
-    deposit: float = Form(...),
     tool_image: UploadFile | None = File(None),
     current_user: User = Depends(user_crud.get_current_user),
     db: Session = Depends(get_db)
@@ -93,7 +92,7 @@ async def update_tool(
         "description": description,
         "base_price": base_price,
         "tool_condition": tool_condition,
-        "deposit": deposit,
+        "deposit": tool_crud.calculate_deposit(base_price, tool_condition),
     }
 
     if tool_image is not None:
@@ -123,6 +122,15 @@ async def update_tool(
         "creator_city": tool.creator.city if tool.creator else None,
         "creator_country": tool.creator.country if tool.creator else None,
     }
+
+
+@router.get("/calculate-deposit")
+def calculate_deposit(
+    base_price: float = Query(..., gt=0),
+    tool_condition: str = Query(...),
+):
+    deposit = tool_crud.calculate_deposit(base_price, tool_condition)
+    return {"deposit": float(deposit)}
 
 
 @router.get("/", response_model=Dict)

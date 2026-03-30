@@ -152,14 +152,14 @@
     </nav>
 
     <!-- Hero -->
-    <section class="relative pt-7 z-10 px-6 pb-16 md:px-8 md:pb-24">
+    <section class="relative z-10 mt-10 px-6 pb-16 md:px-8 md:pb-24">
       <div class="mx-auto flex max-w-7xl justify-center">
         <div class="max-w-4xl text-center">
           <div
               class="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
           >
             <span class="h-2 w-2 rounded-full bg-lime-500"></span>
-            Lokal teilen. Digital absichern.
+            Lokal teilen. Digital absichern
           </div>
 
           <h2

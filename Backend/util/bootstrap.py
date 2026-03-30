@@ -10,10 +10,60 @@ from Backend.model.user.user_model import User
 def ensure_schema_updates():
     inspector = inspect(engine)
     transaction_columns = [column["name"] for column in inspector.get_columns("transactions")]
+    request_columns = [column["name"] for column in inspector.get_columns("requests")]
 
     if "request_id" not in transaction_columns:
         with engine.begin() as connection:
             connection.execute(text("ALTER TABLE transactions ADD COLUMN request_id INTEGER NULL"))
+
+    transaction_column_updates = {
+        "status": "ALTER TABLE transactions ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'Bezahlt'",
+        "lender_return_condition": "ALTER TABLE transactions ADD COLUMN lender_return_condition VARCHAR(100) NULL",
+        "borrower_return_condition": "ALTER TABLE transactions ADD COLUMN borrower_return_condition VARCHAR(100) NULL",
+        "final_condition": "ALTER TABLE transactions ADD COLUMN final_condition VARCHAR(100) NULL",
+        "return_requested_at": "ALTER TABLE transactions ADD COLUMN return_requested_at DATETIME NULL",
+        "return_confirmed_at": "ALTER TABLE transactions ADD COLUMN return_confirmed_at DATETIME NULL",
+        "platform_fee": "ALTER TABLE transactions ADD COLUMN platform_fee DECIMAL(10, 2) NULL",
+        "lender_payout": "ALTER TABLE transactions ADD COLUMN lender_payout DECIMAL(10, 2) NULL",
+        "borrower_refund": "ALTER TABLE transactions ADD COLUMN borrower_refund DECIMAL(10, 2) NULL",
+    }
+
+    for column_name, sql in transaction_column_updates.items():
+        if column_name not in transaction_columns:
+            with engine.begin() as connection:
+                connection.execute(text(sql))
+
+    transaction_blob_columns = {"picture_before", "picture_after"}
+    existing_transaction_columns = {column["name"] for column in inspector.get_columns("transactions")}
+
+    if transaction_blob_columns.issubset(existing_transaction_columns):
+        with engine.begin() as connection:
+            connection.execute(text("ALTER TABLE transactions MODIFY picture_before MEDIUMBLOB NULL"))
+            connection.execute(text("ALTER TABLE transactions MODIFY picture_after MEDIUMBLOB NULL"))
+
+    if "transaction_reviews" not in inspector.get_table_names():
+        with engine.begin() as connection:
+            connection.execute(text("""
+                CREATE TABLE transaction_reviews (
+                    id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    transaction_id INTEGER NOT NULL UNIQUE,
+                    borrower_id INTEGER NULL,
+                    lender_id INTEGER NULL,
+                    borrower_condition VARCHAR(100) NULL,
+                    lender_condition VARCHAR(100) NULL,
+                    lender_picture MEDIUMBLOB NULL,
+                    review_status VARCHAR(50) NOT NULL DEFAULT 'Offen',
+                    support_decision_condition VARCHAR(100) NULL,
+                    support_note TEXT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    resolved_at DATETIME NULL,
+                    resolved_by INTEGER NULL,
+                    CONSTRAINT fk_transaction_reviews_transaction FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+                    CONSTRAINT fk_transaction_reviews_borrower FOREIGN KEY (borrower_id) REFERENCES users(id) ON DELETE SET NULL,
+                    CONSTRAINT fk_transaction_reviews_lender FOREIGN KEY (lender_id) REFERENCES users(id) ON DELETE SET NULL,
+                    CONSTRAINT fk_transaction_reviews_resolved_by FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE SET NULL
+                )
+            """))
 
 
 def seed_roles_and_admin():

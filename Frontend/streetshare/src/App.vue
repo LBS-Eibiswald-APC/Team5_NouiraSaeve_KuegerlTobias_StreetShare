@@ -11,6 +11,7 @@ const route = useRoute();
     <transition name="fade-slide">
       <Navbar v-if="route.meta.showNav" />
       <MainNav v-else-if="route.meta.showNav === false" />
+      <div v-else></div>
     </transition>
     <router-view v-slot="{ Component }">
       <transition name="fade-slide" mode="out-in">

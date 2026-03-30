@@ -26,8 +26,17 @@ class CRUDTool(CRUDBase[Transaction, TransactionCreate, TransactionUpdate]):
                 "start_date": transaction.start_date,
                 "end_date": transaction.end_date,
                 "created_at": transaction.created_at,
-                "picture_before": transaction.picture_before,
-                "picture_after": transaction.picture_after,
+                "has_picture_before": transaction.picture_before is not None,
+                "has_picture_after": transaction.picture_after is not None,
+                "status": transaction.status,
+                "lender_return_condition": transaction.lender_return_condition,
+                "borrower_return_condition": transaction.borrower_return_condition,
+                "final_condition": transaction.final_condition,
+                "return_requested_at": transaction.return_requested_at,
+                "return_confirmed_at": transaction.return_confirmed_at,
+                "platform_fee": float(transaction.platform_fee) if transaction.platform_fee is not None else None,
+                "lender_payout": float(transaction.lender_payout) if transaction.lender_payout is not None else None,
+                "borrower_refund": float(transaction.borrower_refund) if transaction.borrower_refund is not None else None,
             })
 
         return response

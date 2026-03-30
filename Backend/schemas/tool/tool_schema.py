@@ -31,6 +31,7 @@ class ToolResponse(BaseModel):
     base_price: float | None
     deposit: float | None
     tool_condition: str | None
+    availability_status: str = "Verfügbar"
     deleted: bool | None
     deleted_at: datetime | None = None
 
@@ -40,3 +41,10 @@ class ToolResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ToolChat(BaseModel):
+    id: int
+    name: str
+    deposit: float
+    tool_condition: str

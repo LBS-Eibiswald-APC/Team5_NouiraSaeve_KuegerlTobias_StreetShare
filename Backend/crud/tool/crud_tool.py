@@ -1,6 +1,9 @@
+from decimal import Decimal, ROUND_HALF_UP
+
 from sqlalchemy.orm import Session, joinedload
 from Backend.crud.base import CRUDBase
 from Backend.model.tools.tools_model import Tool
+from Backend.model.transactions.transactions_model import Transaction
 from Backend.schemas.tool.tool_schema import ToolCreate, ToolUpdate
 
 from Backend.model.user.user_model import User
@@ -12,6 +15,35 @@ from PIL import Image, ImageOps
 
 
 class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
+    usageFactor = {
+        "Neu": 0.25,
+        "Minimal abgenutzt": 0.22,
+        "Gebraucht": 0.18,
+        "Gut abgenutzt": 0.12,
+        "Defekt": 0.05,
+    }
+
+    def calculate_deposit(self, base_price: float | None, tool_condition: str | None):
+        if base_price is None or tool_condition not in self.usageFactor:
+            return 0.00
+
+        deposit = base_price * self.usageFactor[tool_condition]
+
+        return deposit
+
+    @staticmethod
+    def _get_availability_status(db: Session, tool_id: int) -> str:
+        active_transaction = (
+            db.query(Transaction.id)
+            .filter(
+                Transaction.tool_id == tool_id,
+                Transaction.status.in_(["Bezahlt", "Rueckgabe ausstehend", "In Review"]),
+            )
+            .first()
+        )
+
+        return "Ausgeliehen" if active_transaction else "Verfügbar"
+
     def get_user_tools(
             self,
             db: Session,
@@ -31,6 +63,7 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 base_price=float(t.base_price) if t.base_price else None,
                 deposit=float(t.deposit) if t.deposit else None,
                 tool_condition=t.tool_condition,
+                availability_status=self._get_availability_status(db, t.id),
                 creator_display_name=t.creator.display_name if t.creator else None,
                 creator_city=t.creator.city if t.creator else None,
                 creator_country=t.creator.country if t.creator else None,
@@ -85,6 +118,7 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 base_price=float(t.base_price) if t.base_price else None,
                 deposit=float(t.deposit) if t.deposit else None,
                 tool_condition=t.tool_condition,
+                availability_status=self._get_availability_status(db, t.id),
                 creator_display_name=t.creator.display_name if t.creator else None,
                 creator_city=t.creator.city if t.creator else None,
                 creator_country=t.creator.country if t.creator else None,

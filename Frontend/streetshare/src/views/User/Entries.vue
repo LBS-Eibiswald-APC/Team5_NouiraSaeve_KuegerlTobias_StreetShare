@@ -44,27 +44,6 @@ function closeDescriptionModal() {
   selectedDescription.value = "";
 }
 
-const usageFactor = {
-  "Neu": 0.35,
-  "Minimal abgenutzt": 0.30,
-  "Gebraucht": 0.25,
-  "Gut abgenutzt": 0.2,
-  "Defekt": 0.1,
-}
-
-const week_multiplier = 1
-
-function calcDeposit() {
-  const factor = usageFactor[newTool.value.tool_condition]
-  let deposit = newTool.value.base_price * factor * week_multiplier
-  if (newTool.value.base_price < 100) {
-    deposit *= 0.8
-  } else {
-    deposit *= 0.7
-  }
-  newTool.value.deposit = deposit.toFixed(2);
-}
-
 async function loadMyTools(toolUpdated) {
   if (toolUpdated) {
     $toast.success("Erfolgreich die Tools aktualisiert!", {"position": "top-right"});
@@ -321,12 +300,12 @@ watch(showModal, async (newVal) => {
       </div>
 
       <!-- Modal MyTools -->
-      <ToolCreate :new-tool="newTool" :show-modal="showModal" :usage-factor="usageFactor"
-                  :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showModal = false"
+      <ToolCreate :new-tool="newTool" :show-modal="showModal"
+                  :tool-store="toolStore" @close="showModal = false"
                   @saved="loadMyTools(true)"/>
       <ToolEdit
-          :edit-tool="editTool" :show-modal="showEdit" :usage-factor="usageFactor"
-          :week_multiplier="week_multiplier" :tool-store="toolStore" @close="showEdit = false"
+          :edit-tool="editTool" :show-modal="showEdit"
+          :tool-store="toolStore" @close="showEdit = false"
           @saved="loadMyTools(true)"
       />
 

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { BIconEye, BIconEyeSlash } from "bootstrap-icons-vue";
+import { BIconArrowLeft, BIconEye, BIconEyeSlash } from "bootstrap-icons-vue";
 import { useAuthStore } from "@/store/authStore";
 
 const email = ref("");
@@ -29,12 +29,39 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="text-neutral-900 dark:text-white">
-    <div class="mx-auto flex min-h-[calc(100vh-6rem)] max-w-7xl items-center justify-center px-4">
+  <div class="min-h-screen px-4 text-neutral-900 dark:text-white flex items-center justify-center">
+    <div class="flex justify-center w-full">
       <div
-          class="w-full max-w-md rounded-[28px] border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sm:p-10"
+          class="w-full max-w-4xl rounded-[28px] border border-neutral-200 bg-white p-8 shadow-md dark:border-neutral-800 dark:bg-neutral-900 sm:p-10"
       >
-        <div class="mb-8">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10 md:divide-x md:divide-neutral-200 dark:md:divide-neutral-800">
+        <div class="col-span-1">
+          <div class="flex h-full p-7">
+            <div class="flex-col">
+              <button
+                type="button"
+                @click="router.push('/')"
+                class="inline-flex w-fit items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-200 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-white"
+            >
+              <BIconArrowLeft />
+              Zurück zur Homepage
+              </button>
+              <div class="space-y-4 mt-2">
+                <p class="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-white">
+                  Schön, dass du wieder da bist.
+                </p>
+                <p class="max-w-sm text-sm leading-7 text-neutral-500 dark:text-neutral-400">
+                  Melde dich an, um Werkzeuge in deiner Umgebung sicher zu verleihen oder auszuleihen.
+                </p>
+                <p class="max-w-sm text-sm leading-7 text-neutral-500 dark:text-neutral-400">
+                  StreetShare hält Anfragen, Ausleihen und Rückgaben für dich übersichtlich an einem Ort.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-1">
+          <div class="mb-8">
           <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
             Willkommen zurück
           </p>
@@ -110,6 +137,8 @@ const handleLogin = async () => {
             Jetzt registrieren
           </span>
         </p>
+      </div>
+    </div>
       </div>
     </div>
   </div>

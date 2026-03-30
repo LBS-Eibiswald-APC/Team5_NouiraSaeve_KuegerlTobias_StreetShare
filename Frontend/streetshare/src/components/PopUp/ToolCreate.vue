@@ -5,8 +5,6 @@ import {useToast} from "vue-toast-notification";
 const props = defineProps({
   showModal: Boolean,
   newTool: Object,
-  usageFactor: Object,
-  week_multiplier: Number,
   toolStore: Object
 });
 
@@ -50,17 +48,8 @@ watch(
     { immediate: true, deep: true }
 );
 
-function calcDeposit() {
-  const factor = props.usageFactor[localTool.tool_condition];
-  let deposit = localTool.base_price * factor * props.week_multiplier;
-
-  if (localTool.base_price < 100) {
-    deposit *= 0.8;
-  } else {
-    deposit *= 0.7;
-  }
-
-  localTool.deposit = Number(deposit.toFixed(2));
+async function calcDeposit() {
+  localTool.deposit = await props.toolStore.calculateDeposit(localTool.base_price, localTool.tool_condition);
 }
 
 async function onImageChange(event) {
@@ -100,7 +89,7 @@ async function onImageChange(event) {
 }
 
 async function saveTool() {
-  calcDeposit();
+  await calcDeposit();
   if (localTool.name && localTool.description && localTool.base_price && localTool.base_price > 0 && localTool.tool_image) {
     const success = await props.toolStore.createTool({ ...localTool });
 
