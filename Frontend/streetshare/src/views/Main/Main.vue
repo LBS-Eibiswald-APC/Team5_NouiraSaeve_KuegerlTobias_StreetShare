@@ -410,24 +410,24 @@ async function startRequestInChat(tool) {
           <div class="mt-6 grid gap-4 sm:grid-cols-2">
             <div class="rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-800">
               <p class="text-sm text-neutral-500 dark:text-neutral-400">Zustand</p>
-              <p class="mt-1 font-semibold">
+              <p class="mt-1 text-black dark:text-neutral-400 font-semibold">
                 {{ selectedTool?.tool_condition || "Unbekannt" }}
               </p>
             </div>
 
             <div class="rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-800">
               <p class="text-sm text-neutral-500 dark:text-neutral-400">Pfand</p>
-              <p class="mt-1 font-semibold">
+              <p class="mt-1 text-black dark:text-neutral-400 font-semibold">
                 {{ euroFormat.format(selectedTool?.deposit ?? 0) }}
               </p>
             </div>
 
             <div class="rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-800 sm:col-span-2">
               <p class="text-sm text-neutral-500 dark:text-neutral-400">Anbieter</p>
-              <p class="mt-1 font-semibold">
+              <p class="mt-1 text-black dark:text-neutral-400 font-semibold">
                 {{ selectedTool?.creator_display_name }}
               </p>
-              <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              <p class="mt-1 text-sm text-black dark:text-neutral-400">
                 {{ selectedTool?.creator_city }}, {{ selectedTool?.creator_country }}
               </p>
             </div>
