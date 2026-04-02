@@ -17,8 +17,15 @@ const selectedTransaction = ref(null);
 const lenderReturnCondition = ref("Gebraucht");
 const borrowerReturnCondition = ref("Gebraucht");
 const returnPhoto = ref(null);
+const page = ref(1);
+const perPage = ref(5);
 
 const conditions = ["Neu", "Minimal abgenutzt", "Gebraucht", "Gut abgenutzt", "Defekt"];
+const totalPages = computed(() => Math.max(1, Math.ceil(transactions.value.length / perPage.value)));
+const paginatedTransactions = computed(() => {
+  const start = (page.value - 1) * perPage.value;
+  return transactions.value.slice(start, start + perPage.value);
+});
 
 const dateFormat = new Intl.DateTimeFormat("de-DE", {
   dateStyle: "medium",
@@ -103,9 +110,24 @@ async function loadTransactions() {
 
   try {
     transactions.value = await transactionsStore.getMyTransactions();
+    if (page.value > totalPages.value) {
+      page.value = totalPages.value;
+    }
   } finally {
     loading.value = false;
   }
+}
+
+function changePage(nextPage) {
+  if (nextPage < 1 || nextPage > totalPages.value) {
+    return;
+  }
+
+  page.value = nextPage;
+}
+
+function changePerPage() {
+  page.value = 1;
 }
 
 function openReturnRequestModal(transaction) {
@@ -225,6 +247,7 @@ onMounted(async () => {
       <div class="px-4 py-2 rounded-2xl bg-lime-100 dark:bg-lime-500/10 text-lime-700 dark:text-lime-400 font-semibold">
         {{ transactions.length }} Transaktionen
       </div>
+
     </div>
 
     <div class="mb-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
@@ -253,7 +276,7 @@ onMounted(async () => {
         </tr>
 
         <tr
-          v-for="transaction in transactions"
+          v-for="transaction in paginatedTransactions"
           v-else
           :key="transaction.id"
           class="border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800/60 transition align-top"
@@ -328,6 +351,46 @@ onMounted(async () => {
         </tr>
         </tbody>
       </table>
+    </div>
+
+    <div
+      v-if="transactions.length > 0"
+      class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+        <span>Pro Seite:</span>
+        <select
+          v-model="perPage"
+          @change="changePerPage"
+          class="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-white"
+        >
+          <option :value="5">5</option>
+          <option :value="10">10</option>
+          <option :value="25">25</option>
+        </select>
+      </div>
+
+      <div class="flex items-center justify-center gap-3">
+        <button
+          @click="changePage(page - 1)"
+          :disabled="page <= 1 || loading"
+          class="px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition disabled:opacity-50"
+        >
+          Zurück
+        </button>
+
+        <span class="text-sm text-neutral-500 dark:text-neutral-400">
+          Seite {{ page }} von {{ totalPages }}
+        </span>
+
+        <button
+          @click="changePage(page + 1)"
+          :disabled="page >= totalPages || loading"
+          class="px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition disabled:opacity-50"
+        >
+          Weiter
+        </button>
+      </div>
     </div>
 
     <transition name="fade">

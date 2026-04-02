@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal, ROUND_HALF_UP
 from typing import List
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
@@ -22,49 +21,6 @@ router = APIRouter(
     tags=["transactions"]
 )
 
-CONDITION_ORDER = ["Neu", "Minimal abgenutzt", "Gebraucht", "Gut abgenutzt", "Defekt"]
-
-
-def calculate_return_distribution(deposit, original_condition: str | None, final_condition: str | None):
-    deposit_value = Decimal(str(deposit or 0)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    platform_fee = (deposit_value * Decimal("0.05")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-    if not final_condition:
-        lender_payout = (deposit_value * Decimal("0.05")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-        borrower_refund = deposit_value - platform_fee - lender_payout
-        return platform_fee, lender_payout, borrower_refund
-
-    if final_condition == "Defekt":
-        lender_payout = deposit_value - platform_fee
-        borrower_refund = Decimal("0.00")
-        return platform_fee, lender_payout, borrower_refund
-
-    try:
-        original_index = CONDITION_ORDER.index(original_condition or CONDITION_ORDER[0])
-    except ValueError:
-        original_index = 0
-
-    try:
-        final_index = CONDITION_ORDER.index(final_condition)
-    except ValueError:
-        final_index = original_index
-
-    worse_steps = max(0, final_index - original_index)
-    lender_percentage = Decimal("0.05") + (Decimal("0.10") * Decimal(worse_steps))
-    lender_percentage = min(lender_percentage, Decimal("0.95"))
-
-    lender_payout = (deposit_value * lender_percentage).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    max_lender_payout = deposit_value - platform_fee
-    if lender_payout > max_lender_payout:
-        lender_payout = max_lender_payout
-
-    borrower_refund = (deposit_value - platform_fee - lender_payout).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    if borrower_refund < 0:
-        borrower_refund = Decimal("0.00")
-
-    return platform_fee, lender_payout, borrower_refund
-
-
 def build_transaction_response(db: Session, transaction):
     tool = tool_crud.get(db, transaction.tool_id)
     borrower = user_crud.get(db, transaction.borrower_id)
@@ -85,6 +41,7 @@ def build_transaction_response(db: Session, transaction):
         "has_picture_before": transaction.picture_before is not None,
         "has_picture_after": transaction.picture_after is not None,
         "status": transaction.status,
+        "original_tool_condition": transaction.original_tool_condition,
         "lender_return_condition": transaction.lender_return_condition,
         "borrower_return_condition": transaction.borrower_return_condition,
         "final_condition": transaction.final_condition,
@@ -113,6 +70,9 @@ def create_transaction(
     if current_user.id not in [transaction.borrower_id, transaction.lender_id] and not is_admin(current_user):
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Sie sind nicht erlaubt dies zu tun.")
 
+    if transaction.original_tool_condition is None:
+        transaction = transaction.model_copy(update={"original_tool_condition": tool.tool_condition})
+
     return transaction_crud.create(db, transaction)
 
 
@@ -137,6 +97,8 @@ def pay_request_transaction(
     if existing_transaction:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Für diese Anfrage existiert bereits eine Transaktion.")
 
+    tool = tool_crud.get(db, request.tool_id)
+
     transaction = transaction_crud.create(db, TransactionCreate(
         tool_id=request.tool_id,
         request_id=request.id,
@@ -147,6 +109,7 @@ def pay_request_transaction(
         created_at=request.created_at,
         picture_before=None,
         picture_after=None,
+        original_tool_condition=tool.tool_condition if tool else None,
     ))
 
     requests_crud.update(
@@ -229,12 +192,21 @@ async def confirm_return(
     if not submitted_condition:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Bitte eine finale Kondition angeben.")
 
+    if (
+        transaction.borrower_return_condition
+        and transaction.borrower_return_condition != submitted_condition
+    ):
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail="Leiher und Verleiher haben unterschiedliche Konditionen angegeben. Bitte an den Support weitergeben."
+        )
+
     photo_bytes = await normalize_uploaded_image(picture_after)
 
     tool = tool_crud.get(db, transaction.tool_id)
-    platform_fee, lender_payout, borrower_refund = calculate_return_distribution(
+    platform_fee, lender_payout, borrower_refund = transaction_crud.calculate_return_distribution(
         tool.deposit if tool else 0,
-        tool.tool_condition if tool else None,
+        transaction.original_tool_condition or (tool.tool_condition if tool else None),
         submitted_condition,
     )
 

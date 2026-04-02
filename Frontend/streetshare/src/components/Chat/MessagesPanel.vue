@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import {
+  BIconList,
   BIconChatDots,
   BIconCheck,
   BIconCheck2All,
@@ -73,6 +74,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showConversationsToggle: {
+    type: Boolean,
+    default: false,
+  },
   getChatTitle: {
     type: Function,
     required: true,
@@ -109,6 +114,7 @@ const emit = defineEmits([
   "delete-chat",
   "open-payment",
   "cancel-request-draft",
+  "toggle-conversations",
 ]);
 
 const startDateInput = ref(null);
@@ -212,32 +218,41 @@ function isReturnedEarly() {
 </script>
 
 <template>
-  <section class="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+  <section class="flex h-full min-h-0 max-h-[110vh] flex-col overflow-hidden border-t border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 lg:max-h-none lg:border-l lg:border-t-0">
     <div
       v-if="selectedChat || requestDraft"
       class="flex h-full min-h-0 flex-col"
     >
+      <!-- Header -->
       <div class="flex items-center justify-between border-b border-neutral-200 px-6 py-5 dark:border-neutral-800">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-lime-500">
-            Unterhaltung
-          </p>
-          <h2 class="mt-1 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            {{ selectedChat ? getChatTitle(selectedChat) : requestDraft?.toolName || "Neue Anfrage" }}
-          </h2>
-          <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-            mit {{ selectedChat ? getChatPartner(selectedChat) : requestDraft?.creatorName || "Unbekannter Nutzer" }}
-          </p>
-          <p
-            v-if="connectionStatus"
-            class="mt-1 text-xs font-medium text-neutral-400 dark:text-neutral-500"
+        <div class="flex items-start gap-3">
+          <button
+            v-if="showConversationsToggle"
+            type="button"
+            class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800"
+            @click="emit('toggle-conversations')"
           >
-            {{ connectionStatus }}
-          </p>
+            <BIconList class="text-lg" />
+          </button>
+
+          <div>
+            <h2 class="mt-1 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+              {{ selectedChat ? getChatTitle(selectedChat) : requestDraft?.toolName || "Neue Anfrage" }}
+            </h2>
+            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              {{ selectedChat ? getChatPartner(selectedChat) : requestDraft?.creatorName || "Unbekannter Nutzer" }}
+            </p>
+            <p
+              v-if="connectionStatus"
+              class="mt-1 text-xs font-medium text-neutral-400 dark:text-neutral-500"
+            >
+              {{ connectionStatus }}
+            </p>
+          </div>
         </div>
       </div>
-
-      <div data-chat-messages class="min-h-0 flex-1 space-y-4 overflow-y-auto bg-neutral-50 px-6 py-6 dark:bg-neutral-950/60">
+      <!-- Request -->
+      <div data-chat-messages class="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-neutral-50 px-4 py-5 sm:px-6 sm:py-6 dark:bg-neutral-950/60">
         <div
           v-if="requestDraft"
           class="rounded-3xl border border-lime-200 bg-white p-5 shadow-sm dark:border-lime-500/20 dark:bg-neutral-900"
@@ -315,7 +330,6 @@ function isReturnedEarly() {
             </button>
           </div>
         </div>
-
         <div
           v-if="selectedRequest"
           class="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
@@ -449,13 +463,13 @@ function isReturnedEarly() {
             </p>
           </div>
         </div>
-
+        <!-- Messages -->
         <template v-else-if="selectedChat">
           <div
             v-for="message in getMessages(selectedChat)"
             :key="message.id"
             :class="isOwnMessage(message) ? 'ml-auto bg-neutral-950 text-white dark:bg-white dark:text-black' : 'mr-auto bg-white text-neutral-900 dark:bg-neutral-900 dark:text-white'"
-            class="max-w-xl rounded-3xl border border-neutral-200 px-5 py-4 shadow-sm dark:border-neutral-800"
+            class="max-w-xl rounded-3xl border border-neutral-200 px-4 py-2 shadow-sm dark:border-neutral-800"
           >
             <div class="flex items-start justify-between gap-4">
               <p
@@ -473,13 +487,13 @@ function isReturnedEarly() {
             </div>
             <p
               :class="isOwnMessage(message) ? 'text-white dark:text-black' : 'text-neutral-700 dark:text-neutral-300'"
-              class="mt-2 whitespace-pre-wrap text-sm leading-7"
+              class="mt-2 mb-1 whitespace-pre-wrap text-sm leading-7"
             >
               {{ getMessageText(message) }}
             </p>
             <div
               v-if="isOwnMessage(message)"
-              class="mt-3 flex justify-end"
+              class="flex justify-end"
             >
               <span
                 :class="message.is_read ? 'text-sky-400 dark:text-sky-500' : 'text-white/70 dark:text-black/60'"
@@ -495,7 +509,7 @@ function isReturnedEarly() {
 
       <div
         v-if="selectedChat"
-        class="border-t border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"
+        class="border-t border-neutral-200 bg-white px-4 py-4 sm:px-6 sm:py-5 dark:border-neutral-800 dark:bg-neutral-900"
       >
         <div class="flex items-end gap-3">
           <textarea
@@ -520,6 +534,16 @@ function isReturnedEarly() {
     </div>
 
     <div v-else class="flex h-full min-h-0 flex-col items-center justify-center px-6 text-center">
+      <button
+        v-if="showConversationsToggle"
+        type="button"
+        class="mb-6 inline-flex items-center gap-2 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:hover:bg-neutral-800"
+        @click="emit('toggle-conversations')"
+      >
+        <BIconList />
+        Chats anzeigen
+      </button>
+
       <div class="flex h-20 w-20 items-center justify-center rounded-[28px] bg-neutral-100 dark:bg-neutral-800">
         <BIconChatDots class="text-3xl text-neutral-500 dark:text-neutral-300" />
       </div>

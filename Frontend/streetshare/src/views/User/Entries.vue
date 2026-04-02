@@ -33,6 +33,13 @@ const editTool = ref();
 const showDelete = ref();
 const showDescriptionModal = ref(false);
 const selectedDescription = ref("");
+const page = ref(1);
+const perPage = ref(5);
+const totalPages = computed(() => Math.max(1, Math.ceil(myTools.value.length / perPage.value)));
+const paginatedTools = computed(() => {
+  const start = (page.value - 1) * perPage.value;
+  return myTools.value.slice(start, start + perPage.value);
+});
 
 function openDescriptionModal(description) {
   selectedDescription.value = description || "Keine Beschreibung vorhanden";
@@ -49,6 +56,21 @@ async function loadMyTools(toolUpdated) {
     $toast.success("Erfolgreich die Tools aktualisiert!", {"position": "top-right"});
   }
   myTools.value = await toolStore.getUserTools();
+  if (page.value > totalPages.value) {
+    page.value = totalPages.value;
+  }
+}
+
+function changePage(nextPage) {
+  if (nextPage < 1 || nextPage > totalPages.value) {
+    return;
+  }
+
+  page.value = nextPage;
+}
+
+function changePerPage() {
+  page.value = 1;
 }
 
 async function clickedEdit(tool) {
@@ -138,7 +160,7 @@ watch(showModal, async (newVal) => {
 </script>
 <template>
   <div
-      class="h-screen text-neutral-900 dark:text-white font-sans flex gap-6">
+      class="text-neutral-900 dark:text-white font-sans flex gap-6">
     <div class="flex-1 flex flex-col gap-6 w-full">
       <div
           class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl shadow-xl p-6"
@@ -219,7 +241,7 @@ watch(showModal, async (newVal) => {
 
             <tbody>
             <tr
-                v-for="tool in myTools"
+                v-for="tool in paginatedTools"
                 :key="tool.id"
                 class="border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800/60 transition"
             >
@@ -296,6 +318,43 @@ watch(showModal, async (newVal) => {
             </tr>
             </tbody>
           </table>
+        </div>
+
+        <div v-if="myTools.length > 0" class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+            <span>Pro Seite:</span>
+            <select
+                v-model="perPage"
+                @change="changePerPage"
+                class="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3 py-2 text-sm text-neutral-900 dark:text-white"
+            >
+              <option :value="5">5</option>
+              <option :value="10">10</option>
+              <option :value="25">25</option>
+            </select>
+          </div>
+
+          <div class="flex items-center justify-center gap-3">
+            <button
+                @click="changePage(page - 1)"
+                :disabled="page <= 1"
+                class="px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition disabled:opacity-50"
+            >
+              Zurück
+            </button>
+
+            <span class="text-sm text-neutral-500 dark:text-neutral-400">
+              Seite {{ page }} von {{ totalPages }}
+            </span>
+
+            <button
+                @click="changePage(page + 1)"
+                :disabled="page >= totalPages"
+                class="px-4 py-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition disabled:opacity-50"
+            >
+              Weiter
+            </button>
+          </div>
         </div>
       </div>
 

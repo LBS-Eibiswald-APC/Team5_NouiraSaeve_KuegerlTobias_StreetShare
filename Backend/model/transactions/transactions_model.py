@@ -17,6 +17,7 @@ class Transaction(Base):
     picture_before = Column(MEDIUMBLOB, nullable=True)
     picture_after = Column(MEDIUMBLOB, nullable=True)
     status = Column(String(50), nullable=False, server_default="Bezahlt")
+    original_tool_condition = Column(String(100), nullable=True)
     lender_return_condition = Column(String(100), nullable=True)
     borrower_return_condition = Column(String(100), nullable=True)
     final_condition = Column(String(100), nullable=True)

@@ -35,7 +35,7 @@ export const useChatStore = defineStore("chat", {
         connectToConversation(conversationId, { onMessage, onOpen, onClose, onError } = {}) {
             this.disconnectSocket();
 
-            const socket = new WebSocket(`${getWebSocketBaseUrl()}/messages/ws/${conversationId}/0`);
+            const socket = new WebSocket(`${getWebSocketBaseUrl()}/messages/ws/${conversationId}`);
 
             socket.onopen = (event) => {
                 this.socket = socket;

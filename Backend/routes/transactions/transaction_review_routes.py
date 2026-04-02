@@ -12,7 +12,6 @@ from Backend.crud.tool.crud_tool import tool_crud
 from Backend.crud.transaction_reviews.crud_transaction_reviews import transaction_review_crud
 from Backend.crud.transactions.crud_transactions import transaction_crud
 from Backend.crud.user.crud_user import user_crud
-from Backend.routes.transactions.transaction_routes import calculate_return_distribution
 from Backend.schemas.transaction_reviews.transaction_reviews_schema import TransactionReviewCreate, TransactionReviewResponse
 from Backend.util.image_uploads import normalize_uploaded_image
 
@@ -113,9 +112,9 @@ def resolve_review(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Transaction not found")
 
     tool = tool_crud.get(db, transaction.tool_id)
-    platform_fee, lender_payout, borrower_refund = calculate_return_distribution(
+    platform_fee, lender_payout, borrower_refund = transaction_crud.calculate_return_distribution(
         tool.deposit if tool else 0,
-        tool.tool_condition if tool else None,
+        transaction.original_tool_condition or (tool.tool_condition if tool else None),
         final_condition,
     )
 

@@ -162,11 +162,11 @@ watch(activeTab, () => {
 </script>
 
 <template>
-  <div class="min-h-screen text-neutral-900 dark:text-white font-sans">
-    <div class="mx-auto flex min-h-[calc(100vh-2rem)] gap-6 px-4 py-4 sm:px-6 lg:min-h-[calc(100vh-5rem)] lg:py-10">
+  <div class="text-neutral-900 dark:text-white font-sans">
+    <div class="mx-auto flex max-w-[1800px] gap-6 px-4 py-4 sm:px-6 lg:py-5">
       <!-- Desktop Sidebar -->
       <aside
-          class="hidden lg:block lg:w-72 shrink-0 rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sticky top-8 self-start h-[calc(100vh-4rem)]"
+          class="hidden lg:flex lg:w-72 lg:flex-col shrink-0 rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sticky top-6 self-start lg:h-[760px] xl:h-[780px]"
       >
         <div class="mb-4 px-2">
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-lime-500">
@@ -180,7 +180,7 @@ watch(activeTab, () => {
           </p>
         </div>
 
-        <nav class="flex flex-col gap-2">
+        <nav class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
           <button
               v-for="tab in tabs"
               :key="tab.key"

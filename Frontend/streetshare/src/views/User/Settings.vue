@@ -359,7 +359,7 @@ async function saveSettings() {
 </script>
 
 <template>
-  <div class="min-h-screen dark:text-white flex justify-center overflow-auto">
+  <div class="dark:text-white flex justify-center overflow-auto">
     <div
         class="w-full mx-auto rounded-2xl border border-neutral-200 bg-white p-8 shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
     >

@@ -40,7 +40,7 @@ const emit = defineEmits(["update:search", "select"]);
 </script>
 
 <template>
-  <aside class="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+  <aside class="flex h-full min-h-0 flex-col overflow-hidden rounded-[28px] border border-neutral-200 bg-neutral-50 shadow-xl dark:border-neutral-800 dark:bg-neutral-950 lg:rounded-none lg:border-0 lg:border-r lg:bg-neutral-50/80 lg:shadow-sm lg:dark:bg-neutral-950/40">
     <div class="border-b border-neutral-200 p-5 dark:border-neutral-800">
       <div class="flex items-center gap-3">
         <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-lime-500 text-black">
@@ -68,7 +68,7 @@ const emit = defineEmits(["update:search", "select"]);
       </div>
     </div>
 
-    <div class="min-h-0 flex-1 overflow-y-auto p-3">
+    <div class="min-h-0 flex-1 overflow-y-auto p-3 overscroll-contain">
       <div v-if="loading" class="space-y-3">
         <div
           v-for="index in 4"
@@ -102,7 +102,7 @@ const emit = defineEmits(["update:search", "select"]);
             ? 'border-lime-400 bg-lime-50 dark:border-lime-500/70 dark:bg-lime-500/10'
             : chat.unread_count > 0
               ? 'border-red-200 bg-red-50/70 dark:border-red-900/60 dark:bg-red-950/20'
-              : 'border-transparent bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800/70'"
+              : 'border-neutral-200 bg-white/70 hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/40 dark:hover:bg-neutral-800/70'"
           class="mb-2 block w-full rounded-2xl border p-4 text-left transition"
           @click="emit('select', chat)"
         >

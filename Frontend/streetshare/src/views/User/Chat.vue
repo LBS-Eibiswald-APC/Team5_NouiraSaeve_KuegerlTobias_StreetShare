@@ -33,9 +33,33 @@ const search = ref("");
 const draftMessage = ref("");
 const connectionStatus = ref("Verbinde...");
 const blockedDraftNoticeToolId = ref(null);
+const isMobileView = ref(false);
+const showConversationsMenu = ref(false);
 let activeConversationRefreshInterval = null;
 let conversationsRefreshInterval = null;
 let requestsRefreshInterval = null;
+
+function updateViewportState() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  isMobileView.value = window.innerWidth < 1024;
+
+  if (!isMobileView.value) {
+    showConversationsMenu.value = false;
+  }
+}
+
+function openConversationsMenu() {
+  if (isMobileView.value) {
+    showConversationsMenu.value = true;
+  }
+}
+
+function closeConversationsMenu() {
+  showConversationsMenu.value = false;
+}
 
 function getLocalDateTimeValue(date = new Date()) {
   const pad = (value) => String(value).padStart(2, "0");
@@ -326,6 +350,14 @@ async function scrollToBottom() {
   }
 }
 
+async function scrollToTop() {
+  await nextTick();
+  const container = document.querySelector("[data-chat-messages]");
+  if (container) {
+    container.scrollTop = 0;
+  }
+}
+
 function mergeChats(nextChats) {
   const existingMessagesByConversation = new Map(
     chats.value.map((chat) => [chat.id, chat.messages || []])
@@ -375,7 +407,6 @@ async function refreshMessages(conversationId, { markRead = false } = {}) {
   await refreshConversations();
   await loadRequests();
   await loadTransactions();
-  await scrollToBottom();
 }
 
 function stopRefreshTimers() {
@@ -438,6 +469,7 @@ async function openConversation(chat) {
     return;
   }
 
+  closeConversationsMenu();
   selectedChat.value = chat;
   loadingMessages.value = true;
   connectionStatus.value = "Verbinde...";
@@ -681,6 +713,8 @@ async function deleteRejectedChat() {
 
 onBeforeMount(async () => {
   try {
+    updateViewportState();
+    window.addEventListener("resize", updateViewportState);
     hydratePendingRequestDraft();
     await Promise.all([
       refreshConversations(),
@@ -707,6 +741,7 @@ onBeforeMount(async () => {
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateViewportState);
   stopRefreshTimers();
   chatStore.disconnectSocket();
 });
@@ -715,6 +750,15 @@ watch(
   () => selectedChat.value?.id,
   async () => {
     await scrollToBottom();
+  }
+);
+
+watch(
+  () => visiblePendingRequestDraft.value,
+  async (draft) => {
+    if (draft) {
+      await scrollToTop();
+    }
   }
 );
 
@@ -729,53 +773,72 @@ watch(
 </script>
 
 <template>
-  <div class="grid h-[calc(100vh-9rem)] min-h-0 gap-6 lg:h-[calc(100vh-7rem)] lg:grid-cols-[340px_minmax(0,1fr)]">
-    <ConversationsPanel
-      :loading="loading"
-      :search="search"
-      :filtered-chats="filteredChats"
-      :selected-chat-id="selectedChat?.id ?? null"
-      :get-chat-title="getChatTitle"
-      :get-chat-partner="getChatPartner"
-      :get-chat-activity="getChatActivity"
-      :get-last-message="getLastMessage"
-      @update:search="search = $event"
-      @select="openConversation"
-    />
+  <div class="min-h-0">
+    <div class="relative grid h-[calc(100dvh-7.5rem)] overflow-hidden rounded-[32px] border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900 lg:min-h-[680px] lg:h-auto lg:max-h-[760px] lg:grid-cols-[340px_minmax(0,1fr)] lg:grid-rows-1 xl:min-h-[700px] xl:max-h-[780px]">
+      <div
+        v-if="isMobileView && showConversationsMenu"
+        class="absolute inset-0 z-30 bg-neutral-950/35 backdrop-blur-[1px] lg:hidden"
+        @click="closeConversationsMenu"
+      ></div>
 
-    <MessagesPanel
-      :selected-chat="selectedChat"
-      :loading-messages="loadingMessages"
-      :connection-status="connectionStatus"
-      :draft-message="draftMessage"
-      :request-draft="visiblePendingRequestDraft"
-      :request-submitting="requestSubmitting"
-      :selected-request="selectedChatRequest"
-      :can-respond-to-request="canRespondToSelectedRequest"
-      :request-action-loading="requestActionLoading"
-      :deleting-chat="deletingChat"
-      :can-send-messages="canSendMessages"
-      :can-delete-rejected-chat="canDeleteRejectedChat"
-      :selected-transaction="selectedTransaction"
-      :payment-hint="paymentHint"
-      :can-open-payment="canOpenPayment"
-      :payment-loading="paymentLoading"
-      :get-chat-title="getChatTitle"
-      :get-chat-partner="getChatPartner"
-      :get-messages="getMessages"
-      :is-own-message="isOwnMessage"
-      :get-message-author="getMessageAuthor"
-      :get-message-text="getMessageText"
-      @update:draft-message="draftMessage = $event"
-      @update:request-draft="pendingRequestDraft = $event"
-      @send="sendCurrentMessage"
-      @create-request="createRequestFromDraft"
-      @accept-request="respondToRequest('accept')"
-      @reject-request="respondToRequest('reject')"
-      @delete-chat="deleteRejectedChat"
-      @open-payment="showPaymentModal = true"
-      @cancel-request-draft="clearPendingRequestDraft"
-    />
+      <div
+        :class="isMobileView
+          ? showConversationsMenu
+            ? 'pointer-events-auto translate-x-0 opacity-100'
+            : 'pointer-events-none -translate-x-full opacity-0'
+          : 'translate-x-0 opacity-100'"
+        class="absolute inset-y-0 left-0 z-40 w-[88%] max-w-[360px] transition duration-200 lg:pointer-events-auto lg:static lg:z-auto lg:w-auto lg:max-w-none"
+      >
+        <ConversationsPanel
+          :loading="loading"
+          :search="search"
+          :filtered-chats="filteredChats"
+          :selected-chat-id="selectedChat?.id ?? null"
+          :get-chat-title="getChatTitle"
+          :get-chat-partner="getChatPartner"
+          :get-chat-activity="getChatActivity"
+          :get-last-message="getLastMessage"
+          @update:search="search = $event"
+          @select="openConversation"
+        />
+      </div>
+
+      <MessagesPanel
+        :selected-chat="selectedChat"
+        :loading-messages="loadingMessages"
+        :connection-status="connectionStatus"
+        :draft-message="draftMessage"
+        :request-draft="visiblePendingRequestDraft"
+        :request-submitting="requestSubmitting"
+        :selected-request="selectedChatRequest"
+        :can-respond-to-request="canRespondToSelectedRequest"
+        :request-action-loading="requestActionLoading"
+        :deleting-chat="deletingChat"
+        :can-send-messages="canSendMessages"
+        :can-delete-rejected-chat="canDeleteRejectedChat"
+        :selected-transaction="selectedTransaction"
+        :payment-hint="paymentHint"
+        :can-open-payment="canOpenPayment"
+        :payment-loading="paymentLoading"
+        :get-chat-title="getChatTitle"
+        :get-chat-partner="getChatPartner"
+        :get-messages="getMessages"
+        :is-own-message="isOwnMessage"
+        :get-message-author="getMessageAuthor"
+        :get-message-text="getMessageText"
+        :show-conversations-toggle="isMobileView"
+        @update:draft-message="draftMessage = $event"
+        @update:request-draft="pendingRequestDraft = $event"
+        @send="sendCurrentMessage"
+        @create-request="createRequestFromDraft"
+        @accept-request="respondToRequest('accept')"
+        @reject-request="respondToRequest('reject')"
+        @delete-chat="deleteRejectedChat"
+        @open-payment="showPaymentModal = true"
+        @cancel-request-draft="clearPendingRequestDraft"
+        @toggle-conversations="openConversationsMenu"
+      />
+    </div>
 
     <FakePaypalPaymentPopUp
       :show-modal="showPaymentModal"

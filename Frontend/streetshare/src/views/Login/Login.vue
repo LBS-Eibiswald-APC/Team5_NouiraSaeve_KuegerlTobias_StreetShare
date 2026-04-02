@@ -34,9 +34,9 @@ const handleLogin = async () => {
       <div
           class="w-full max-w-4xl rounded-[28px] border border-neutral-200 bg-white p-8 shadow-md dark:border-neutral-800 dark:bg-neutral-900 sm:p-10"
       >
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10 md:divide-x md:divide-neutral-200 dark:md:divide-neutral-800">
+      <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 sm:divide-x sm:divide-neutral-200 dark:sm:divide-neutral-800">
         <div class="col-span-1">
-          <div class="flex h-full p-7">
+          <div class="flex h-full sm:p-7">
             <div class="flex-col">
               <button
                 type="button"
@@ -66,7 +66,7 @@ const handleLogin = async () => {
             Willkommen zurück
           </p>
           <h1 class="mt-2 text-3xl font-bold tracking-tight text-black dark:text-white">
-            Login
+            Anmelden
           </h1>
         </div>
 
@@ -124,7 +124,7 @@ const handleLogin = async () => {
               :disabled="auth.loading"
               class="w-full rounded-2xl bg-neutral-950 px-4 py-3.5 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black"
           >
-            {{ auth.loading ? "Logge ein..." : "Login" }}
+            {{ auth.loading ? "Melde mich an..." : "Anmelden" }}
           </button>
         </form>
 

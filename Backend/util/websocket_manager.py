@@ -1,8 +1,7 @@
 from fastapi import WebSocket
 from collections import defaultdict
 
-
-class ConnectionManager:
+class WebsocketManager:
     def __init__(self):
         self.active_connections: dict[int, list[WebSocket]] = defaultdict(list)
 
@@ -10,11 +9,10 @@ class ConnectionManager:
         await websocket.accept()
         self.active_connections[conversation_id].append(websocket)
 
-    def disconnect(self, conversation_id: int, websocket: WebSocket):
+    async def disconnect(self, conversation_id: int, websocket: WebSocket):
         if conversation_id in self.active_connections:
             if websocket in self.active_connections[conversation_id]:
                 self.active_connections[conversation_id].remove(websocket)
-
             if not self.active_connections[conversation_id]:
                 del self.active_connections[conversation_id]
 
@@ -29,6 +27,6 @@ class ConnectionManager:
                 await connection.send_json(message)
             except Exception:
                 disconnected.append(connection)
-
+        
         for connection in disconnected:
-            self.disconnect(conversation_id, connection)
+            await self.disconnect(conversation_id, connection)

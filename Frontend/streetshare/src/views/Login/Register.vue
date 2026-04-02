@@ -3,6 +3,7 @@ import { reactive, computed, ref } from "vue";
 import router from "../../router/index.js";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "vue-toast-notification";
+import { BIconArrowLeft } from "bootstrap-icons-vue";
 
 const auth = useAuthStore();
 const $toast = useToast();
@@ -253,6 +254,15 @@ const register = async () => {
       <div
           class="w-full max-w-4xl bg-white dark:bg-neutral-900 p-8 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800"
       >
+        <button
+            type="button"
+            @click="router.push('/')"
+            class="mb-6 inline-flex w-fit items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-200 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-white"
+        >
+          <BIconArrowLeft />
+          Zurück zur Homepage
+        </button>
+
         <h2 class="text-3xl font-bold text-neutral-900 dark:text-white">
           Konto erstellen
         </h2>

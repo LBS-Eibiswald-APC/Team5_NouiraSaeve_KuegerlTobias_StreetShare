@@ -13,6 +13,7 @@ class TransactionCreate(BaseModel):
     created_at: datetime | None
     picture_before: bytes | None = None
     picture_after: bytes | None = None
+    original_tool_condition: str | None = None
 
 class TransactionUpdate(BaseModel):
     tool_id: int | None = None
@@ -25,6 +26,7 @@ class TransactionUpdate(BaseModel):
     picture_before: bytes | None = None
     picture_after: bytes | None = None
     status: str | None = None
+    original_tool_condition: str | None = None
     lender_return_condition: str | None = None
     borrower_return_condition: str | None = None
     final_condition: str | None = None
@@ -57,6 +59,7 @@ class TransactionResponse(BaseModel):
     has_picture_before: bool = False
     has_picture_after: bool = False
     status: str | None = None
+    original_tool_condition: str | None = None
     lender_return_condition: str | None = None
     borrower_return_condition: str | None = None
     final_condition: str | None = None

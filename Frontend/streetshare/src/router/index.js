@@ -30,7 +30,7 @@ const routes = [
         path: "/",
         name: "landing",
         component: LandingPage,
-        meta: {requiresAuth: false, showNav: null }
+        meta: {requiresAuth: false, showNav: true }
     },
     {
         path: "/dashboard",

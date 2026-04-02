@@ -11,15 +11,15 @@ from Backend.crud.chats.messages import crud_messages
 from Backend.crud.requests.crud_requests import requests_crud
 from Backend.crud.user.crud_user import user_crud
 from Backend.model.user.user_model import User
-from Backend.routes.websocket_manager import ConnectionManager
 from Backend.schemas.chats.messages import MessagesRead
+from Backend.util.websocket_manager import WebsocketManager
 
 router = APIRouter(
     prefix="/messages",
     tags=["messages"]
 )
 
-manager = ConnectionManager()
+manager = WebsocketManager()
 
 def get_current_user_from_websocket(websocket: WebSocket, db: Session) -> User:
     token = websocket.cookies.get("access_token")
@@ -42,13 +42,12 @@ def get_current_user_from_websocket(websocket: WebSocket, db: Session) -> User:
         return user
     except JWTError as exc:
         raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token") from exc
+    
 
-
-@router.websocket("/ws/{conversation_id}/{sender_id}")
+@router.websocket("/ws/{conversation_id}")
 async def websocket_chat(
     websocket: WebSocket,
     conversation_id: int,
-    sender_id: int,
 ):
     db = SessionLocal()
 
@@ -59,7 +58,7 @@ async def websocket_chat(
         if conversation is None:
             raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Conversation not allowed")
 
-        await manager.connect(conversation_id, websocket)
+        await manager.connect(conversation.id, websocket)
 
         while True:
             data = await websocket.receive_json()

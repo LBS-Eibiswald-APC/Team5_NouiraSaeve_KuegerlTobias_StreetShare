@@ -1,13 +1,19 @@
 <script setup>
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
 import MainNav from "@/components/MainNav.vue";
 
 const route = useRoute();
+const appClasses = computed(() => (
+  route.name === "landing"
+    ? "min-h-screen bg-neutral-50 dark:bg-neutral-950 text-white font-sans flex flex-col"
+    : "min-h-screen bg-neutral-200 dark:bg-neutral-800 text-white font-sans flex flex-col"
+));
 </script>
 
 <template>
-  <div class="min-h-screen bg-neutral-200 dark:bg-neutral-800 text-white font-sans flex flex-col">
+  <div :class="appClasses">
     <transition name="fade-slide">
       <Navbar v-if="route.meta.showNav" />
       <MainNav v-else-if="route.meta.showNav === false" />

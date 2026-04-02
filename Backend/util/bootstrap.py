@@ -18,6 +18,7 @@ def ensure_schema_updates():
 
     transaction_column_updates = {
         "status": "ALTER TABLE transactions ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'Bezahlt'",
+        "original_tool_condition": "ALTER TABLE transactions ADD COLUMN original_tool_condition VARCHAR(100) NULL",
         "lender_return_condition": "ALTER TABLE transactions ADD COLUMN lender_return_condition VARCHAR(100) NULL",
         "borrower_return_condition": "ALTER TABLE transactions ADD COLUMN borrower_return_condition VARCHAR(100) NULL",
         "final_condition": "ALTER TABLE transactions ADD COLUMN final_condition VARCHAR(100) NULL",
