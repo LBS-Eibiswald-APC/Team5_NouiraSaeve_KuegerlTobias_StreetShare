@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
 import MainNav from "@/components/MainNav.vue";
+import { Analytics } from "@vercel/analytics/vue";
 
 const route = useRoute();
 const appClasses = computed(() => (
@@ -14,6 +15,7 @@ const appClasses = computed(() => (
 
 <template>
   <div :class="appClasses">
+    <Analytics />
     <transition name="fade-slide">
       <Navbar v-if="route.meta.showNav" />
       <MainNav v-else-if="route.meta.showNav === false" />
