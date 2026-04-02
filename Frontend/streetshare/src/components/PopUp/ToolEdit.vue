@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, watch, ref } from "vue";
 import { useToast } from "vue-toast-notification";
+import { buildApiUrl } from "@/services/config.js";
 
 const props = defineProps({
   showModal: Boolean,
@@ -47,7 +48,7 @@ watch(
         imagePreview.value = null;
         imageError.value = "";
         existingImageUrl.value = newVal.id
-            ? `http://127.0.0.1:8000/tools/image/${newVal.id}`
+            ? buildApiUrl(`/tools/image/${newVal.id}`)
             : null;
       }
     },
