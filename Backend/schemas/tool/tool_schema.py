@@ -7,9 +7,10 @@ class ToolCreate(BaseModel):
     name: str
     description: str
     base_price: Decimal | None = None
+    tool_image: bytes
+    tool_condition: str
     deposit: Decimal | None = None
-    tool_condition: str | None = None
-    created_by: int | None = None
+    created_by: int
 
 
 class ToolUpdate(BaseModel):
@@ -18,6 +19,9 @@ class ToolUpdate(BaseModel):
     base_price: Decimal | None = None
     deposit: Decimal | None = None
     tool_condition: str | None = None
+    tool_image: bytes | None = None
+    deleted: bool
+    deleted_at: datetime | None = None
 
 
 class ToolResponse(BaseModel):
@@ -27,6 +31,9 @@ class ToolResponse(BaseModel):
     base_price: float | None
     deposit: float | None
     tool_condition: str | None
+    availability_status: str = "Verfügbar"
+    deleted: bool | None
+    deleted_at: datetime | None = None
 
     creator_display_name: str | None
     creator_city: str | None
@@ -34,3 +41,10 @@ class ToolResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ToolChat(BaseModel):
+    id: int
+    name: str
+    deposit: float
+    tool_condition: str
