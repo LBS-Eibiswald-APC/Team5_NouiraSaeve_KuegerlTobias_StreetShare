@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from Backend.core.database import SessionLocal
 from Backend.crud.tool.crud_tool import tool_crud
+from Backend.model.role.role_model import Role
+from Backend.model.user.user_model import User
 from Backend.model.tools.tools_model import Tool
 
 
@@ -133,3 +135,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
