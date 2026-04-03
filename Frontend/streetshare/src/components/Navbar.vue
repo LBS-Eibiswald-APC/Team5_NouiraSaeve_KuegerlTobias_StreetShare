@@ -49,22 +49,22 @@ const goRegister = () => {
           </div>
         </button>
 
-        <div class="hidden lg:flex items-center gap-8 bg-neutral-950/30 py-3 px-4 rounded-full">
+        <div class="hidden lg:flex items-center gap-8 dark:bg-neutral-950/30 bg-neutral-200 py-3 px-4 rounded-full">
           <a
               href="#features"
-              class="text-sm font-medium text-neutral-600 rounded-full transition hover:text-black hover:scale-105 dark:text-neutral-300 dark:hover:text-white py-1 px-2"
+              class="text-sm font-medium text-neutral-800 rounded-full transition duration-200 hover:text-black hover:scale-105 dark:text-neutral-300 dark:hover:text-white py-1 px-2 hover:bg-neutral-400/30"
           >
             Features
           </a>
           <a
               href="#how"
-              class="text-sm font-medium text-neutral-600 rounded-full transition hover:text-black hover:scale-105 dark:text-neutral-300 dark:hover:text-white py-1 px-2"
+              class="text-sm font-medium text-neutral-800 rounded-full transition hover:text-black hover:scale-105 dark:text-neutral-300 dark:hover:text-white py-1 px-2 hover:bg-neutral-400/30 duration-200"
           >
             So funktioniert's
           </a>
           <a
               href="#trust"
-              class="text-sm font-medium text-neutral-600 rounded-full transition hover:text-black hover:scale-105 dark:text-neutral-300 dark:hover:text-white py-1 px-2"
+              class="text-sm font-medium text-neutral-800 rounded-full transition hover:text-black hover:scale-105 dark:text-neutral-300 dark:hover:text-white py-1 px-2 hover:bg-neutral-400/30 duration-200"
           >
             Vertrauen
           </a>

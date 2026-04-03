@@ -52,7 +52,8 @@ export const useToolsStore = defineStore("tools", {
                 if (this.filters.zip?.trim()) params.zip = this.filters.zip.trim();
                 if (this.filters.country?.trim()) params.country = this.filters.country.trim();
 
-                const response = await api.get("/tools", { params });
+                const response = await api.get("/tools/", { params });
+
 
                 if (response.status === 200) {
                     const data = response.data;

@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, nextTick, onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
 import { useToast } from "vue-toast-notification";
 import { useChatStore } from "@/store/chatStore";
@@ -61,6 +61,23 @@ function closeConversationsMenu() {
   showConversationsMenu.value = false;
 }
 
+function parseBackendDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  const normalizedValue =
+    typeof value === "string"
+      ? value.replace(" ", "T")
+      : value;
+
+  const date = new Date(normalizedValue);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 function getLocalDateTimeValue(date = new Date()) {
   const pad = (value) => String(value).padStart(2, "0");
 
@@ -108,7 +125,8 @@ function getChatActivity(chat) {
     return "Kein Verlauf";
   }
 
-  return new Date(chat.last_message_created_at).toLocaleString();
+  const date = parseBackendDate(chat.last_message_created_at);
+  return date ? date.toLocaleString() : "Kein Verlauf";
 }
 
 function getMessageText(message) {
@@ -162,7 +180,7 @@ function getChatRequest(chat) {
         return rightActionable - leftActionable;
       }
 
-      return new Date(right.created_at || 0) - new Date(left.created_at || 0);
+            return (parseBackendDate(right.created_at)?.getTime() || 0) - (parseBackendDate(left.created_at)?.getTime() || 0);
     });
 
   return relevantRequests[0] || null;
@@ -249,15 +267,15 @@ const paymentHint = computed(() => {
   }
 
   if (request.status === "Bezahlt" && transaction?.status === "Bezahlt") {
-    return "Die Zahlung ist bestätigt. Jetzt darf das Tool ausgeliehen werden.";
+    return "Die Zahlung ist bestÃ¤tigt. Jetzt darf das Tool ausgeliehen werden.";
   }
 
   if (transaction?.status === "Rueckgabe ausstehend") {
-    return "Die Rückgabe wurde erfasst. Jetzt muss der Leiher mit Foto und finaler Kondition bestätigen.";
+    return "Die RÃ¼ckgabe wurde erfasst. Jetzt muss der Leiher mit Foto und finaler Kondition bestÃ¤tigen.";
   }
 
   if (transaction?.status === "Abgeschlossen") {
-    return "Die Rückgabe ist abgeschlossen. Die Auszahlung wurde bereits berechnet.";
+    return "Die RÃ¼ckgabe ist abgeschlossen. Die Auszahlung wurde bereits berechnet.";
   }
 
   return "";
@@ -457,7 +475,7 @@ function syncPendingRequestDraftState() {
   sessionStorage.removeItem("pendingChatRequest");
 
   if (blockedDraftNoticeToolId.value !== toolId) {
-    toast.error("Für dieses bereits abgelehnte Tool kannst du keine neue Anfrage starten.", {
+    toast.error("FÃ¼r dieses bereits abgelehnte Tool kannst du keine neue Anfrage starten.", {
       position: "top-right",
     });
     blockedDraftNoticeToolId.value = toolId;
@@ -539,7 +557,7 @@ async function restoreConversationFromRoute() {
 
 async function sendCurrentMessage() {
   if (!canSendMessages.value) {
-    connectionStatus.value = "Bei einer abgelehnten Anfrage können keine Nachrichten mehr gesendet werden";
+    connectionStatus.value = "Bei einer abgelehnten Anfrage kÃ¶nnen keine Nachrichten mehr gesendet werden";
     return;
   }
 
@@ -565,7 +583,7 @@ async function createRequestFromDraft() {
   }
 
   if (!draft.message?.trim() || !draft.start_date || !draft.end_date) {
-    toast.error("Bitte fülle alle Felder für die Anfrage aus.", {
+    toast.error("Bitte fÃ¼lle alle Felder fÃ¼r die Anfrage aus.", {
       position: "top-right",
     });
     return;
@@ -635,7 +653,7 @@ async function confirmPayment() {
 
   try {
     await requestStore.payRequest(request.id);
-    toast.success("Zahlung erfolgreich durchgeführt.", {
+    toast.success("Zahlung erfolgreich durchgefÃ¼hrt.", {
       position: "top-right",
     });
     showPaymentModal.value = false;
@@ -691,7 +709,7 @@ async function deleteRejectedChat() {
 
   try {
     await chatStore.deleteChat(selectedChat.value.id);
-    toast.success("Abgelehnter Chat wurde gelöscht.", {
+    toast.success("Abgelehnter Chat wurde gelÃ¶scht.", {
       position: "top-right",
     });
 
@@ -703,7 +721,7 @@ async function deleteRejectedChat() {
 
     dashboardStore.clearChatState();
   } catch (error) {
-    toast.error(error.response?.data?.detail || "Chat konnte nicht gelöscht werden.", {
+    toast.error(error.response?.data?.detail || "Chat konnte nicht gelÃ¶scht werden.", {
       position: "top-right",
     });
   } finally {
@@ -850,3 +868,5 @@ watch(
     />
   </div>
 </template>
+
+

@@ -3,7 +3,6 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import Navbar from "@/components/Navbar.vue";
 import MainNav from "@/components/MainNav.vue";
-
 const route = useRoute();
 const appClasses = computed(() => (
   route.name === "landing"

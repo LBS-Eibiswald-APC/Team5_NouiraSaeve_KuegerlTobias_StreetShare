@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref } from "vue";
 import {
   BIconList,
@@ -119,15 +119,35 @@ const emit = defineEmits([
 
 const startDateInput = ref(null);
 const endDateInput = ref(null);
+function parseBackendDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  const normalizedValue =
+    typeof value === "string"
+      ? value.replace(" ", "T")
+      : value;
+
+  const date = new Date(normalizedValue);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 
 function formatMessageTimestamp(value) {
   if (!value) {
     return "";
   }
 
-  const date = new Date(value);
-  const now = new Date();
+  const date = parseBackendDate(value);
+  if (!date) {
+    return "";
+  }
 
+  const now = new Date();
   const isSameDay =
     date.getDate() === now.getDate() &&
     date.getMonth() === now.getMonth() &&
@@ -174,7 +194,12 @@ function formatDateTimeLocal(value) {
     return "-";
   }
 
-  return new Date(value).toLocaleString([], {
+  const date = parseBackendDate(value);
+  if (!date) {
+    return "-";
+  }
+
+  return date.toLocaleString([], {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -213,7 +238,14 @@ function isReturnedEarly() {
     return false;
   }
 
-  return new Date(props.selectedTransaction.return_requested_at) < new Date(props.selectedRequest.end_date);
+  const returnRequestedAt = parseBackendDate(props.selectedTransaction.return_requested_at);
+  const requestEndDate = parseBackendDate(props.selectedRequest.end_date);
+
+  if (!returnRequestedAt || !requestEndDate) {
+    return false;
+  }
+
+  return returnRequestedAt < requestEndDate;
 }
 </script>
 
@@ -385,10 +417,10 @@ function isReturnedEarly() {
             class="mt-4 rounded-2xl border border-lime-200 bg-lime-50 px-4 py-3 text-sm leading-6 text-lime-900 dark:border-lime-500/20 dark:bg-lime-500/10 dark:text-lime-100"
           >
             <span v-if="isReturnedEarly()">
-              Frühzeitig zurückgegeben am {{ formatDateTimeLocal(selectedTransaction.return_requested_at) }}.
+              FrÃ¼hzeitig zurÃ¼ckgegeben am {{ formatDateTimeLocal(selectedTransaction.return_requested_at) }}.
             </span>
             <span v-else>
-              Rückgabe erfasst am {{ formatDateTimeLocal(selectedTransaction.return_requested_at) }}.
+              RÃ¼ckgabe erfasst am {{ formatDateTimeLocal(selectedTransaction.return_requested_at) }}.
             </span>
           </div>
 
@@ -426,7 +458,7 @@ function isReturnedEarly() {
               :disabled="paymentLoading"
               @click="emit('open-payment')"
             >
-              {{ paymentLoading ? "Zahlung läuft..." : "Jetzt bezahlen" }}
+              {{ paymentLoading ? "Zahlung lÃ¤uft..." : "Jetzt bezahlen" }}
             </button>
           </div>
 
@@ -440,7 +472,7 @@ function isReturnedEarly() {
               :disabled="deletingChat"
               @click="emit('delete-chat')"
             >
-              {{ deletingChat ? "Löscht..." : "Chat löschen" }}
+              {{ deletingChat ? "LÃ¶scht..." : "Chat lÃ¶schen" }}
             </button>
           </div>
         </div>
@@ -459,7 +491,7 @@ function isReturnedEarly() {
               Noch keine Nachrichten
             </p>
             <p class="mt-2 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-              Starte die Unterhaltung, um Details zu Anfrage, Abholung oder Rückgabe zu klären.
+              Starte die Unterhaltung, um Details zu Anfrage, Abholung oder RÃ¼ckgabe zu klÃ¤ren.
             </p>
           </div>
         </div>
@@ -515,7 +547,7 @@ function isReturnedEarly() {
           <textarea
             :value="draftMessage"
             rows="3"
-            :placeholder="canSendMessages ? 'Nachricht schreiben...' : 'Bei einer abgelehnten Anfrage sind keine weiteren Nachrichten möglich.'"
+            :placeholder="canSendMessages ? 'Nachricht schreiben...' : 'Bei einer abgelehnten Anfrage sind keine weiteren Nachrichten mÃ¶glich.'"
             class="min-h-[84px] flex-1 resize-none rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-400 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:placeholder:text-neutral-500"
             :disabled="!canSendMessages"
             @input="emit('update:draftMessage', $event.target.value)"
@@ -548,11 +580,13 @@ function isReturnedEarly() {
         <BIconChatDots class="text-3xl text-neutral-500 dark:text-neutral-300" />
       </div>
       <h3 class="mt-6 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-        Wähle einen Chat aus
+        WÃ¤hle einen Chat aus
       </h3>
       <p class="mt-3 max-w-md text-sm leading-7 text-neutral-500 dark:text-neutral-400">
-        Sobald du links eine Konversation auswählst, erscheinen hier Nachrichten, Details und Aktionen.
+        Sobald du links eine Konversation auswÃ¤hlst, erscheinen hier Nachrichten, Details und Aktionen.
       </p>
     </div>
   </section>
 </template>
+
+
