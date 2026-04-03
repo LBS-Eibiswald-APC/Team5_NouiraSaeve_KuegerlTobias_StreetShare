@@ -27,7 +27,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://streetshare.vercel.app",
+        "https://streetshare.online",
+        "https://www.streetshare.online",
     ],
     allow_credentials=True,
     allow_methods=["*"],

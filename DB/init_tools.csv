@@ -1,10 +1,10 @@
 image_filename,name,description,base_price,tool_condition,created_by
-hammer.jpg,Klauenhammer,Solider Klauenhammer fuer allgemeine Montage- und Reparaturarbeiten,8.00,Gebraucht,1
-maehroboter_makita.jpg,Makita Maehroboter,Automatischer Maehroboter fuer mittelgrosse Gaerten und regelmaessige Pflege,45.00,Minimal abgenutzt,1
-maehdrescher.jpg,Maehdrescher,Grosser Maehdrescher fuer landwirtschaftliche Erntearbeiten auf grossen Flaechen,350.00,Gut abgenutzt,1
-akkubohrer_rot.jpg,Akkubohrer Rot,Vielseitiger Akkubohrer fuer Holz Metall und einfache Montagearbeiten,18.00,Gebraucht,1
-schlagschrauber_airpress.jpg,Schlagschrauber Airpress,Druckluft Schlagschrauber fuer Reifenwechsel und feste Verschraubungen,22.00,Gebraucht,1
-werkzeugkoffer_einhell.jpg,Einhell Werkzeugkoffer,Grosser Werkzeugkoffer mit Steckschluesseln Zangen und Schraubendrehern,25.00,Minimal abgenutzt,1
-traktor.jpg,Traktor,Leistungsstarker Traktor fuer Hofarbeit Transport und landwirtschaftliche Einsaetze,280.00,Gut abgenutzt,1
-staubsauger_james.jpg,Industriestaubsauger James,Nass und Trockensauger fuer Werkstatt Baustelle und Garage,14.00,Gebraucht,1
-akkuschrauber_milwaukee.jpg,Milwaukee Akkuschrauber,Kompakter Akkuschrauber fuer Schraubarbeiten und leichte Bohrungen,20.00,Minimal abgenutzt,1
+hammer.jpg,Klauenhammer,Solider Klauenhammer für allgemeine Montage- und Reparaturarbeiten,8.00,Gebraucht,1
+maehroboter_makita.jpg,Makita Mähroboter,Automatischer Mähroboter für mittelgroße Gärten und regelmäßige Pflege,45.00,Minimal abgenutzt,1
+maehdrescher.jpg,Mähdrescher,Großer Mähdrescher für landwirtschaftliche Erntearbeiten auf großen Flächen,350.00,Gut abgenutzt,1
+akkubohrer_rot.jpg,Akkubohrer Rot,Vielseitiger Akkubohrer für Holz Metall und einfache Montagearbeiten,18.00,Gebraucht,1
+schlagschrauber_airpress.jpg,Schlagschrauber Airpress,Druckluft Schlagschrauber für Reifenwechsel und feste Verschraubungen,22.00,Gebraucht,1
+werkzeugkoffer_einhell.jpg,Einhell Werkzeugkoffer,Großer Werkzeugkoffer mit Steckschlüsseln Zangen und Schraubendrehern,25.00,Minimal abgenutzt,1
+traktor.jpg,Traktor,Leistungsstarker Traktor für Hofarbeit Transport und landwirtschaftliche Einsätze,280.00,Gut abgenutzt,1
+staubsauger_james.jpg,Industriestaubsauger James,Nass und Trockensauger für Werkstatt Baustelle und Garage,14.00,Gebraucht,1
+akkuschrauber_milwaukee.jpg,Milwaukee Akkuschrauber,Kompakter Akkuschrauber für Schraubarbeiten und leichte Bohrungen,20.00,Minimal abgenutzt,1
