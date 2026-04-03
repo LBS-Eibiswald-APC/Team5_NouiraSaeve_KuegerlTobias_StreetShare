@@ -260,22 +260,24 @@ async function startRequestInChat(tool) {
                 />
 
                 <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4">
-                  <div class="rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+                  <div class="rounded-full bg-black/60 border border-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur">
                     {{ tool.tool_condition || "Zustand unbekannt" }}
                   </div>
 
                   <div
                     :class="tool.availability_status === 'Ausgeliehen'
                       ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
-                      : 'bg-white/90 text-neutral-800 dark:bg-neutral-900/90 dark:text-neutral-200'"
+                      : 'bg-white/90 border border-neutral-300 shadow-sm text-neutral-800 dark:bg-neutral-900/90 dark:text-neutral-200'"
                     class="rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap"
                   >
                     {{ tool.availability_status || "Verfügbar" }}
                   </div>
                 </div>
 
-                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent px-6 pb-5 pt-12">
-                  <p class="mb-3 text-sm uppercase tracking-[0.22em] text-white/70">Pfand</p>
+                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent px-6 pb-5 pt-12 ">
+                  <p class="mb-3 text-sm uppercase tracking-[0.22em]">
+                    <span class="rounded-xl bg-neutral-900/60 px-2 py-1">Pfand</span>
+                  </p>
                   <p class="mt-1 text-3xl font-bold text-lime-400">
                     <span class="rounded-xl bg-neutral-900/60 px-2 py-1">{{ euroFormat.format(tool.deposit ?? 0) }}</span>
                   </p>
