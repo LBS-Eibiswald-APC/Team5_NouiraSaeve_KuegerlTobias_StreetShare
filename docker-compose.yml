@@ -1,0 +1,65 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: streetshare-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: streetshare
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: ""
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./DB:/docker-entrypoint-initdb.d:ro
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile
+    container_name: streetshare-backend
+    restart: unless-stopped
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ""
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: streetshare
+      JWT_SECRET_KEY: debd53e36a918852064e1ec9c20fd032
+      COOKIE_SECURE: "false"
+      COOKIE_SAMESITE: "lax"
+      ADMIN_EMAIL: admin@streetshare.at
+      ADMIN_DISPLAY_NAME: admin
+      ADMIN_PASSWORD: admin123
+      ADMIN_FIRST_NAME: StreetShare
+      ADMIN_LAST_NAME: Admin
+      ADMIN_PHONE: "+4366011111111"
+      ADMIN_STREET: Adminhausen
+      ADMIN_HOUSE_NR: "1"
+      ADMIN_ZIP: "8000"
+      ADMIN_CITY: Admin
+      ADMIN_COUNTRY: Österreich
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Frontend/streetshare/Dockerfile
+    container_name: streetshare-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  mysql_data:

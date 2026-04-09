@@ -1,13 +1,49 @@
+from decimal import Decimal, ROUND_HALF_UP
+
 from sqlalchemy.orm import Session, joinedload
-from crud.base import CRUDBase
-from model.tools.tools_model import Tool
-from schemas.tool.tool_schema import ToolCreate, ToolUpdate
+from Backend.crud.base import CRUDBase
+from Backend.model.tools.tools_model import Tool
+from Backend.model.transactions.transactions_model import Transaction
+from Backend.schemas.tool.tool_schema import ToolCreate, ToolUpdate
 
 from Backend.model.user.user_model import User
 from Backend.schemas.tool.tool_schema import ToolResponse
 
+from io import BytesIO
+from PIL import Image, ImageOps
+
+
 
 class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
+    usageFactor = {
+        "Neu": 0.25,
+        "Minimal abgenutzt": 0.22,
+        "Gebraucht": 0.18,
+        "Gut abgenutzt": 0.12,
+        "Defekt": 0.05,
+    }
+
+    def calculate_deposit(self, base_price: float | None, tool_condition: str | None):
+        if base_price is None or tool_condition not in self.usageFactor:
+            return 0.00
+
+        deposit = base_price * self.usageFactor[tool_condition]
+
+        return deposit
+
+    @staticmethod
+    def _get_availability_status(db: Session, tool_id: int) -> str:
+        active_transaction = (
+            db.query(Transaction.id)
+            .filter(
+                Transaction.tool_id == tool_id,
+                Transaction.status.in_(["Bezahlt", "Rueckgabe ausstehend", "In Review"]),
+            )
+            .first()
+        )
+
+        return "Ausgeliehen" if active_transaction else "Verfügbar"
+
     def get_user_tools(
             self,
             db: Session,
@@ -27,23 +63,42 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 base_price=float(t.base_price) if t.base_price else None,
                 deposit=float(t.deposit) if t.deposit else None,
                 tool_condition=t.tool_condition,
+                availability_status=self._get_availability_status(db, t.id),
                 creator_display_name=t.creator.display_name if t.creator else None,
                 creator_city=t.creator.city if t.creator else None,
-                creator_country=t.creator.country if t.creator else None
+                creator_country=t.creator.country if t.creator else None,
+                deleted=t.deleted,
+                deleted_at=t.deleted_at
             ))
         return response
+
+    def compress_image_bytes(self, image_bytes: bytes, max_size=(1600, 1600), quality=82) -> bytes:
+        input_buffer = BytesIO(image_bytes)
+
+        with Image.open(input_buffer) as img:
+            img = ImageOps.exif_transpose(img)
+            img = img.convert("RGB")
+            img.thumbnail(max_size)
+
+            output_buffer = BytesIO()
+            img.save(output_buffer, format="JPEG", quality=quality, optimize=True)
+
+            return output_buffer.getvalue()
 
     def get_filtered(
             self,
             db: Session,
+            name: str | None = None,
             city: str | None = None,
             zip: str | None = None,
             country: str | None = None,
-            skip = 0,
-            limit = 25
+            skip=0,
+            limit=25
     ):
         query = db.query(Tool).join(User)
 
+        if name:
+            query = query.filter(Tool.name.ilike(f"%{name}%"))
         if city:
             query = query.filter(User.city.ilike(f"%{city}%"))
         if zip:
@@ -53,6 +108,7 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
 
         total = query.count()
         tools = query.offset(skip).limit(limit).options(joinedload(Tool.creator)).all()
+
         response = []
         for t in tools:
             response.append(ToolResponse(
@@ -62,9 +118,12 @@ class CRUDTool(CRUDBase[Tool, ToolCreate, ToolUpdate]):
                 base_price=float(t.base_price) if t.base_price else None,
                 deposit=float(t.deposit) if t.deposit else None,
                 tool_condition=t.tool_condition,
+                availability_status=self._get_availability_status(db, t.id),
                 creator_display_name=t.creator.display_name if t.creator else None,
                 creator_city=t.creator.city if t.creator else None,
-                creator_country=t.creator.country if t.creator else None
+                creator_country=t.creator.country if t.creator else None,
+                deleted=t.deleted,
+                deleted_at=t.deleted_at
             ))
 
         return {"tools": response, "total": total}

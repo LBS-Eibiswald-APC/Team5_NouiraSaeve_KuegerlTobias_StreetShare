@@ -1,18 +1,15 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import api from "@/services/api";
 
-
 export const useAuthStore = defineStore("auth", {
-
     state: () => ({
         user: null,
         user_id: null,
-        token: localStorage.getItem("token") || null,
-        isAuthenticated: !!localStorage.getItem("token"),
+        isAuthenticated: false,
+        initialized: false,
         loading: false,
-        error: null
+        error: null,
     }),
-
 
     actions: {
         async getMe() {
@@ -20,31 +17,62 @@ export const useAuthStore = defineStore("auth", {
                 const response = await api.get("/users/me");
                 this.user = response.data;
                 this.user_id = response.data.id;
-                return response.data
+                this.isAuthenticated = true;
+                this.initialized = true;
+                return response.data;
             } catch (error) {
-                return null
+                this.user = null;
+                this.user_id = null;
+                this.isAuthenticated = false;
+                this.initialized = true;
+                throw error;
             }
         },
+
+        async updateProfile(user) {
+            try {
+                const response = await api.put("/users/settings/me", user);
+                this.user = response.data;
+                this.user_id = response.data.id;
+                return response.data;
+            } catch (error) {
+                throw error;
+            }
+        },
+
+        async changePassword(payload) {
+            try {
+                const response = await api.put("/users/password", payload);
+                return response.data;
+            } catch (error) {
+                throw error;
+            }
+        },
+
         async register(payload) {
             this.loading = true;
             this.error = null;
-            try {
-                const response = await api.post(
-                    "/auth/register",
-                    payload
-                );
-                this.token = response.data.access_token;
-                this.user = response.data.user;
-                this.isAuthenticated = true;
 
-                localStorage.setItem(
-                    "token",
-                    this.token
-                );
+            try {
+                const response = await api.post("/auth/register", payload);
+                return response.data;
             } catch (error) {
-                this.error =
-                    error.response?.data?.detail ||
-                    "Register failed";
+                const detail = error.response?.data?.detail;
+
+                if (typeof detail === "object" && detail !== null) {
+                    this.error = {
+                        email: detail.email || "",
+                        display_name: detail.display_name || "",
+                        general: detail.general || "Registrierung fehlgeschlagen.",
+                    };
+                } else {
+                    this.error = {
+                        email: "",
+                        display_name: "",
+                        general: detail || "Registrierung fehlgeschlagen.",
+                    };
+                }
+
                 throw error;
             } finally {
                 this.loading = false;
@@ -54,59 +82,65 @@ export const useAuthStore = defineStore("auth", {
         async login(payload) {
             this.loading = true;
             this.error = null;
+
             try {
                 const formData = new URLSearchParams();
                 formData.append("username", payload.email);
                 formData.append("password", payload.password);
-                const response = await api.post(
-                    "/auth/login",
-                    formData,
-                    {
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    }
-                );
-                this.token = response.data.access_token;
-                this.user = response.data.user;
-                this.isAuthenticated = true;
-                localStorage.setItem(
-                    "token",
-                    this.token
-                );
-                return true
-            } catch (error) {
-                this.error =
-                    error.response?.data?.detail ||
-                    "Login failed";
-                throw error;
 
+                await api.post("/auth/login", formData.toString(), {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                });
+
+                await this.getMe();
+                this.isAuthenticated = true;
+
+                return true;
+            } catch (error) {
+                this.user = null;
+                this.user_id = null;
+                this.isAuthenticated = false;
+                this.error = error.response?.data?.detail || "Login fehlgeschlagen";
+                return false;
             } finally {
                 this.loading = false;
             }
-            return false
         },
 
-
         async fetchUser() {
-            if (!this.token) return;
             try {
-                const response = await api.get(
-                    "/auth/me"
-                );
-                this.user = response.data;
-                this.isAuthenticated = true;
+                await this.getMe();
             } catch {
-                this.logout();
+                this.logout(false);
+            } finally {
+                this.initialized = true;
             }
         },
 
+        async ensureInitialized() {
+            if (this.initialized) {
+                return;
+            }
 
-        logout() {
-            this.user = null;
-            this.token = null;
-            this.isAuthenticated = false;
-            localStorage.removeItem("token");
-        }
+            await this.fetchUser();
+        },
 
-    }
-
+        async logout(callBackend = true) {
+            try {
+                if (callBackend) {
+                    await api.post("/auth/logout");
+                }
+            } catch (error) {
+                console.error("Logout error:", error);
+            } finally {
+                this.user = null;
+                this.user_id = null;
+                this.isAuthenticated = false;
+                this.initialized = true;
+                this.error = null;
+            }
+        },
+    },
 });

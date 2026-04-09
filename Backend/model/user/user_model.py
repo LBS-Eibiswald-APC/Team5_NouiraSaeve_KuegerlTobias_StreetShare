@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from core.database import Base
+from Backend.core.database import Base
 
 
 class User(Base):
@@ -10,7 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String(255), nullable=True)
     last_name = Column(String(255), nullable=True)
-    display_name = Column(String(255), nullable=True)
+    display_name = Column(String(255), nullable=True, unique=True)
     hashed_pw = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, index=True, nullable=True)
     phone = Column(String(255), nullable=True)

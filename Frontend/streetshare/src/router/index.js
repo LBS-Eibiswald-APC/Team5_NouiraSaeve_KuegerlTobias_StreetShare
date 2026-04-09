@@ -4,21 +4,21 @@ import LoginView from "@/views/Login/Login.vue";
 import RegisterView from "@/views/Login/Register.vue";
 import LandingPage from "@/views/LandingPage/LandingPage.vue";
 import MainPage from "@/views/Main/Main.vue";
-import UserMe from "@/views/User/UserMe.vue";
 import {useAuthStore} from "@/store/authStore.js";
+import Dashboard from "@/views/User/Dashboard.vue";
 
 const routes = [
     {
         path: "/login",
         name: "login",
         component: LoginView,
-        meta: { requiresAuth: false, showNav: true }
+        meta: { requiresAuth: false, showNav: null }
     },
     {
         path: "/register",
         name: "register",
         component: RegisterView,
-        meta: { requiresAuth: false, showNav: true  }
+        meta: { requiresAuth: false, showNav: null  }
     },
     {
         path: "/main",
@@ -30,12 +30,12 @@ const routes = [
         path: "/",
         name: "landing",
         component: LandingPage,
-        meta: {requiresAuth: false, showNav: null }
+        meta: {requiresAuth: false, showNav: true }
     },
     {
-        path: "/user/me",
-        name: "user_me",
-        component: UserMe,
+        path: "/dashboard",
+        name: "dashboard",
+        component: Dashboard,
         meta: {requiresAuth: true, showNav: false }
     }
 ];
@@ -46,8 +46,11 @@ const router = createRouter({
 });
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const auth = useAuthStore();
+
+    await auth.ensureInitialized();
+
     if (to.meta.requiresAuth && !auth.isAuthenticated) {
         next("/login");
     } else if (to.path === "/login" && auth.isAuthenticated) {

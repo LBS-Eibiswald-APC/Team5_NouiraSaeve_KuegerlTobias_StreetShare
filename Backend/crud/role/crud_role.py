@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from crud.base import CRUDBase
-from model.role.role_model import Role
-from schemas.role.role_schema import RoleCreate, RoleUpdate
+from Backend.crud.base import CRUDBase
+from Backend.model.role.role_model import Role
+from Backend.schemas.role.role_schema import RoleCreate, RoleUpdate
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
